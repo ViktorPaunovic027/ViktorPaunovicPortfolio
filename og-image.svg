@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0f"/>
+      <stop offset="50%" stop-color="#0d0d1a"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </linearGradient>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00f5ff"/>
+      <stop offset="100%" stop-color="#bf00ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00f5ff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#00f5ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.15" cy="0.85" r="0.4">
+      <stop offset="0%" stop-color="#bf00ff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#bf00ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <!-- Grid -->
+  <g opacity="0.06" stroke="#00f5ff" stroke-width="1">
+    <path d="M0 100 H1200 M0 200 H1200 M0 300 H1200 M0 400 H1200 M0 500 H1200"/>
+    <path d="M100 0 V630 M200 0 V630 M300 0 V630 M400 0 V630 M500 0 V630 M600 0 V630 M700 0 V630 M800 0 V630 M900 0 V630 M1000 0 V630 M1100 0 V630"/>
+  </g>
+
+  <!-- Decorative molecule (right side) -->
+  <g transform="translate(900,315)" opacity="0.85">
+    <g stroke="#00f5ff" stroke-width="1.4" opacity="0.4">
+      <line x1="-100" y1="-90" x2="0" y2="0"/>
+      <line x1="100" y1="-90" x2="0" y2="0"/>
+      <line x1="-100" y1="-90" x2="100" y2="-90"/>
+      <line x1="-110" y1="80" x2="0" y2="0"/>
+      <line x1="110" y1="80" x2="0" y2="0"/>
+      <line x1="-110" y1="80" x2="110" y2="80"/>
+      <line x1="-100" y1="-90" x2="-110" y2="80"/>
+      <line x1="100" y1="-90" x2="110" y2="80"/>
+      <line x1="0" y1="0" x2="0" y2="130"/>
+      <line x1="-110" y1="80" x2="0" y2="130"/>
+      <line x1="110" y1="80" x2="0" y2="130"/>
+    </g>
+    <g>
+      <circle cx="-100" cy="-90" r="10" fill="#00f5ff" filter="url(#blur)" opacity="0.6"/>
+      <circle cx="-100" cy="-90" r="6" fill="#00f5ff"/>
+      <circle cx="100" cy="-90" r="10" fill="#bf00ff" filter="url(#blur)" opacity="0.6"/>
+      <circle cx="100" cy="-90" r="6" fill="#bf00ff"/>
+      <circle cx="0" cy="0" r="12" fill="#00f5ff" filter="url(#blur)" opacity="0.7"/>
+      <circle cx="0" cy="0" r="7" fill="#00f5ff"/>
+      <circle cx="-110" cy="80" r="10" fill="#bf00ff" filter="url(#blur)" opacity="0.6"/>
+      <circle cx="-110" cy="80" r="6" fill="#bf00ff"/>
+      <circle cx="110" cy="80" r="10" fill="#00f5ff" filter="url(#blur)" opacity="0.6"/>
+      <circle cx="110" cy="80" r="6" fill="#00f5ff"/>
+      <circle cx="0" cy="130" r="10" fill="#00ff88" filter="url(#blur)" opacity="0.6"/>
+      <circle cx="0" cy="130" r="6" fill="#00ff88"/>
+    </g>
+  </g>
+
+  <!-- Text content (left) -->
+  <text x="80" y="155" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600" fill="#00f5ff" letter-spacing="6">DATA ANALYST · MALTA</text>
+
+  <text x="80" y="280" font-family="'Space Grotesk', Arial, sans-serif" font-size="100" font-weight="700" fill="#ffffff" letter-spacing="-3">Viktor</text>
+  <text x="80" y="380" font-family="'Space Grotesk', Arial, sans-serif" font-size="100" font-weight="700" fill="#ffffff" letter-spacing="-3">Paunovic</text>
+
+  <!-- Gradient rule -->
+  <rect x="80" y="410" width="160" height="5" rx="2.5" fill="url(#grad)"/>
+
+  <!-- Tagline -->
+  <text x="80" y="465" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="400" fill="#a5a5c0">iGaming Analytics · SQL · Python · Tableau · Power BI</text>
+
+  <!-- Bottom row: stats / links -->
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="80" y="555" font-size="18" font-weight="500" fill="#00f5ff">📍 Malta</text>
+    <text x="200" y="555" font-size="18" font-weight="500" fill="#a5a5c0">·</text>
+    <text x="220" y="555" font-size="18" font-weight="500" fill="#a5a5c0">viktorpaunovic.com</text>
+    <text x="80" y="590" font-size="14" font-weight="400" fill="#666680">Open to work · Junior Data Analyst · iGaming Industry</text>
+  </g>
+</svg>
