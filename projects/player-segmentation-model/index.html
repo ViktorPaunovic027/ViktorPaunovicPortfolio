@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="index, follow">
+  <title>Player Segmentation Model | Viktor Paunovic</title>
+  <meta name="description" content="An interactive player segmentation case study using synthetic iGaming data, Python, pandas, scikit-learn and BigQuery.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://viktorpaunovic.com/projects/player-segmentation-model/">
+  <meta property="og:title" content="Player Segmentation Model | Viktor Paunovic">
+  <meta property="og:description" content="An interactive player segmentation case study using clearly labelled synthetic iGaming data.">
+  <meta property="og:site_name" content="Viktor Paunovic Portfolio">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://viktorpaunovic.com/projects/player-segmentation-model/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2300f5ff'/%3E%3Cstop offset='1' stop-color='%23bf00ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Ccircle cx='19' cy='37' r='7' fill='%2300f5ff'/%3E%3Ccircle cx='39' cy='20' r='8' fill='%23bf00ff'/%3E%3Ccircle cx='46' cy='44' r='6' fill='%2300ff88'/%3E%3Cpath d='M24 32 33 25M25 40l15 3M42 28l3 10' stroke='url(%23g)' stroke-width='3'/%3E%3C/svg%3E">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a0f;--bg-soft:#0d0d1a;--panel:rgba(255,255,255,.035);
+      --panel-strong:rgba(17,17,29,.9);--line:rgba(255,255,255,.09);
+      --white:#f0f0ff;--muted:rgba(240,240,255,.58);--dim:rgba(240,240,255,.36);
+      --cyan:#00f5ff;--purple:#bf00ff;--green:#00ff88;--amber:#f5a623;--pink:#ff5daf;
+      --max:1180px;--radius:20px;
+    }
+    html{scroll-behavior:smooth;scroll-padding-top:90px}
+    body{min-width:320px;background:var(--bg);color:var(--white);font-family:"Inter",sans-serif;line-height:1.65;overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;z-index:-3;background:
+      radial-gradient(circle at 84% 8%,rgba(191,0,255,.09),transparent 28%),
+      radial-gradient(circle at 8% 38%,rgba(0,245,255,.065),transparent 27%),
+      linear-gradient(180deg,#0a0a0f 0%,#0b0a12 52%,#09090e 100%)}
+    a{color:inherit}
+    button{font:inherit}
+    ::selection{background:rgba(191,0,255,.45);color:#fff}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(0,245,255,.32);border-radius:999px}
+    .skip-link{position:fixed;left:1rem;top:1rem;z-index:1000;transform:translateY(-180%);background:var(--cyan);color:#03070a;padding:.7rem 1rem;border-radius:10px;font-weight:700;text-decoration:none}
+    .skip-link:focus{transform:none}
+    #particle-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-2;pointer-events:none;opacity:.88}
+    .grid-fade{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(to bottom,black,transparent 75%)}
+    .container{width:min(calc(100% - 2.5rem),var(--max));margin-inline:auto}
+
+    .topbar{position:sticky;top:0;z-index:50;background:rgba(10,10,15,.74);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .brand{display:inline-flex;align-items:center;gap:.7rem;font-family:"Space Grotesk",sans-serif;font-weight:700;text-decoration:none;letter-spacing:-.02em}
+    .brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(0,245,255,.28);border-radius:10px;background:linear-gradient(145deg,rgba(0,245,255,.12),rgba(191,0,255,.1));box-shadow:0 0 24px rgba(0,245,255,.08)}
+    .brand-mark svg{width:20px;color:var(--cyan)}
+    .nav-links{display:flex;align-items:center;gap:.45rem}
+    .nav-link{display:inline-flex;align-items:center;gap:.5rem;padding:.62rem .9rem;border:1px solid transparent;border-radius:999px;color:var(--muted);font-size:.82rem;font-weight:600;text-decoration:none;transition:.25s ease}
+    .nav-link:hover,.nav-link:focus-visible{color:#fff;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.09)}
+    .nav-link.primary{color:#05060a;background:var(--cyan);border-color:var(--cyan)}
+    .nav-link.primary:hover,.nav-link.primary:focus-visible{background:#74faff;box-shadow:0 8px 28px rgba(0,245,255,.24)}
+    .nav-link svg{width:15px;height:15px}
+
+    .hero{min-height:calc(100vh - 72px);display:grid;grid-template-columns:minmax(0,1.02fr) minmax(360px,.98fr);align-items:center;gap:clamp(2rem,6vw,5.5rem);padding-block:clamp(4rem,8vw,7.2rem)}
+    .eyebrow{display:flex;align-items:center;gap:.65rem;color:var(--cyan);font-size:.74rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+    .eyebrow::before{content:"";width:28px;height:1px;background:currentColor;box-shadow:0 0 10px currentColor}
+    h1,h2,h3{font-family:"Space Grotesk",sans-serif}
+    h1{max-width:760px;margin-top:1.15rem;font-size:clamp(3.15rem,7vw,6.9rem);line-height:.93;letter-spacing:-.052em}
+    h1 .gradient{display:block;background:linear-gradient(110deg,var(--cyan),#d78cff 58%,var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-copy{max-width:640px;margin-top:1.5rem;color:rgba(240,240,255,.68);font-size:clamp(1rem,1.8vw,1.16rem)}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:2rem}
+    .button{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;min-height:46px;padding:.72rem 1.15rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.035);color:#fff;font-size:.84rem;font-weight:700;text-decoration:none;transition:transform .25s ease,border-color .25s ease,background .25s ease,box-shadow .25s ease}
+    .button:hover,.button:focus-visible{transform:translateY(-2px);border-color:rgba(0,245,255,.42);background:rgba(0,245,255,.075)}
+    .button.primary{color:#03060a;background:linear-gradient(135deg,var(--cyan),#76abff);border-color:transparent;box-shadow:0 10px 34px rgba(0,245,255,.15)}
+    .button svg{width:16px;height:16px}
+    .tech-row{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.8rem}
+    .chip{padding:.4rem .72rem;border:1px solid rgba(191,0,255,.23);border-radius:999px;background:rgba(191,0,255,.07);color:#d986ff;font-size:.72rem;font-weight:700}
+    .chip:nth-child(even){border-color:rgba(0,245,255,.2);background:rgba(0,245,255,.06);color:var(--cyan)}
+
+    .cluster-orbit{position:relative;display:grid;place-items:center;aspect-ratio:1;isolation:isolate}
+    .cluster-orbit::before,.cluster-orbit::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+    .cluster-orbit::before{inset:4%;background:radial-gradient(circle,rgba(191,0,255,.12),rgba(0,245,255,.035) 43%,transparent 70%);filter:blur(8px)}
+    .cluster-orbit::after{inset:11%;border:1px solid rgba(0,245,255,.12);box-shadow:inset 0 0 60px rgba(191,0,255,.05);animation:orbitPulse 5s ease-in-out infinite}
+    .cluster-orbit svg{position:relative;z-index:1;width:100%;filter:drop-shadow(0 14px 30px rgba(0,0,0,.38))}
+    .orbit-ring{transform-origin:center;animation:orbitSpin 30s linear infinite}
+    .orbit-ring.reverse{animation-direction:reverse;animation-duration:24s}
+    .hero-stat{position:absolute;z-index:2;display:flex;flex-direction:column;min-width:118px;padding:.8rem .9rem;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(13,13,26,.82);backdrop-filter:blur(16px);box-shadow:0 12px 35px rgba(0,0,0,.32)}
+    .hero-stat strong{font-family:"Space Grotesk",sans-serif;font-size:1.3rem;color:#fff}
+    .hero-stat span{color:var(--dim);font-size:.66rem;text-transform:uppercase;letter-spacing:.11em}
+    .hero-stat.one{left:-1%;top:17%}.hero-stat.two{right:-2%;bottom:20%}
+    @keyframes orbitSpin{to{transform:rotate(360deg)}}
+    @keyframes orbitPulse{50%{transform:scale(1.035);border-color:rgba(191,0,255,.2)}}
+
+    .notice{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1rem;padding:1rem 1.15rem;border:1px solid rgba(245,166,35,.23);border-radius:14px;background:rgba(245,166,35,.055);color:rgba(255,240,210,.74);font-size:.82rem}
+    .notice svg{width:19px;height:19px;flex:none;color:var(--amber);margin-top:.08rem}
+    .notice strong{color:#ffd48c}
+
+    .section{padding-block:clamp(5rem,9vw,8rem);border-top:1px solid rgba(255,255,255,.06)}
+    .section-heading{display:grid;grid-template-columns:minmax(0,.8fr) minmax(320px,.6fr);align-items:end;gap:2rem;margin-bottom:2.4rem}
+    .section-heading h2{margin-top:.55rem;font-size:clamp(2rem,4vw,3.45rem);line-height:1.05;letter-spacing:-.035em}
+    .section-heading p{color:var(--muted);font-size:.94rem}
+    .card{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,rgba(255,255,255,.048),rgba(255,255,255,.018));box-shadow:0 18px 60px rgba(0,0,0,.18)}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+    .reveal.in-view{opacity:1;transform:none}
+
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1rem}
+    .kpi{position:relative;overflow:hidden;padding:1.35rem}
+    .kpi::after{content:"";position:absolute;left:18%;right:18%;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+    .kpi-label{color:var(--dim);font-size:.69rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .kpi-value{display:block;margin-top:.35rem;font-family:"Space Grotesk",sans-serif;font-size:clamp(1.7rem,3vw,2.35rem);font-weight:700;letter-spacing:-.04em}
+    .kpi-foot{color:var(--muted);font-size:.72rem}
+
+    .lab{overflow:hidden}
+    .lab-toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.15rem;border-bottom:1px solid var(--line)}
+    .lab-toolbar h3{font-size:1rem}
+    .segment-controls{display:flex;flex-wrap:wrap;gap:.4rem}
+    .segment-button{display:inline-flex;align-items:center;gap:.42rem;padding:.48rem .72rem;border:1px solid rgba(255,255,255,.09);border-radius:999px;background:rgba(255,255,255,.025);color:var(--muted);font-size:.69rem;font-weight:700;cursor:pointer;transition:.22s ease}
+    .segment-button::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dot,#fff);box-shadow:0 0 9px var(--dot,#fff)}
+    .segment-button:hover,.segment-button:focus-visible,.segment-button[aria-pressed="true"]{color:#fff;border-color:var(--dot,var(--cyan));background:color-mix(in srgb,var(--dot,var(--cyan)) 12%,transparent)}
+    .lab-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.65fr)}
+    .scatter-wrap{position:relative;min-width:0;padding:1.25rem 1rem .7rem}
+    #segment-scatter{display:block;width:100%;height:auto;min-height:360px}
+    .axis-label{fill:rgba(240,240,255,.39);font-size:12px;font-family:Inter,sans-serif}
+    .grid-line{stroke:rgba(255,255,255,.055);stroke-width:1}
+    .scatter-point{transition:opacity .25s ease,r .25s ease,filter .25s ease}
+    .scatter-label{font-family:"Space Grotesk",sans-serif;font-size:12px;font-weight:700;paint-order:stroke;stroke:#0b0b12;stroke-width:4px;stroke-linejoin:round}
+    .profile{display:flex;flex-direction:column;padding:1.5rem;border-left:1px solid var(--line);background:rgba(8,8,15,.25)}
+    .profile-overline{color:var(--dim);font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+    .profile h3{margin-top:.5rem;font-size:1.45rem;line-height:1.12}
+    .profile-desc{min-height:73px;margin-top:.7rem;color:var(--muted);font-size:.83rem}
+    .profile-metrics{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:1.2rem}
+    .profile-metric{padding:.8rem;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.025)}
+    .profile-metric span{display:block;color:var(--dim);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em}
+    .profile-metric strong{font-family:"Space Grotesk",sans-serif;font-size:1rem}
+    .profile-action{margin-top:auto;padding-top:1.25rem;color:rgba(240,240,255,.72);font-size:.78rem}
+    .profile-action strong{display:block;margin-bottom:.25rem;color:var(--green);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}
+    .scatter-caption{padding:0 1.3rem 1.1rem;color:var(--dim);font-size:.7rem}
+
+    .table-card{margin-top:1rem;overflow:hidden}
+    .table-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.2rem 1.35rem;border-bottom:1px solid var(--line)}
+    .table-head h3{font-size:1rem}.table-head span{color:var(--dim);font-size:.7rem}
+    .table-scroll{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;min-width:780px;font-size:.79rem}
+    th,td{padding:.95rem 1.1rem;text-align:right;border-bottom:1px solid rgba(255,255,255,.055);white-space:nowrap}
+    th:first-child,td:first-child{text-align:left}
+    th{color:var(--dim);font-size:.65rem;letter-spacing:.09em;text-transform:uppercase;background:rgba(255,255,255,.018)}
+    td{color:rgba(240,240,255,.74);font-variant-numeric:tabular-nums}
+    tbody tr:last-child td{border-bottom:0}tbody tr:hover{background:rgba(255,255,255,.025)}
+    .row-name{display:inline-flex;align-items:center;gap:.55rem;color:#fff;font-weight:700}.row-dot{width:8px;height:8px;border-radius:50%;background:var(--row-color);box-shadow:0 0 10px var(--row-color)}
+    .retention{color:var(--green);font-weight:700}
+
+    .pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;counter-reset:step}
+    .step{position:relative;padding:1.5rem;counter-increment:step;overflow:hidden}
+    .step::before{content:"0" counter(step);display:block;margin-bottom:1.4rem;color:var(--cyan);font-family:"Space Grotesk",sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.14em}
+    .step::after{content:"";position:absolute;top:28px;right:-12px;width:42px;height:1px;background:linear-gradient(90deg,var(--purple),transparent)}
+    .step h3{font-size:1.05rem}.step p{margin-top:.55rem;color:var(--muted);font-size:.81rem}
+    .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+    .feature-card{padding:1.5rem}
+    .feature-card h3{display:flex;align-items:center;gap:.7rem;font-size:1rem}
+    .feature-card h3 span{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:rgba(191,0,255,.11);color:#d677ff}
+    .feature-list{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+    .feature{padding:.38rem .62rem;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:rgba(240,240,255,.67);font-size:.72rem}
+
+    .evaluation-grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:1rem}
+    .score-panel{padding:1.6rem}
+    .score-panel h3,.decision-panel h3{font-size:1.12rem}
+    .scores{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.2rem}
+    .score{padding:1rem;border:1px solid rgba(255,255,255,.075);border-radius:13px;background:rgba(255,255,255,.025)}
+    .score strong{display:block;color:var(--cyan);font-family:"Space Grotesk",sans-serif;font-size:1.5rem}.score span{color:var(--dim);font-size:.67rem}
+    .score-note{margin-top:1rem;color:var(--muted);font-size:.76rem}
+    .decision-panel{padding:1.6rem}
+    .k-list{margin-top:1.35rem;display:grid;gap:.8rem}
+    .k-row{display:grid;grid-template-columns:34px 1fr 44px;align-items:center;gap:.75rem;color:var(--muted);font-size:.74rem}
+    .k-bar{height:7px;border-radius:999px;background:rgba(255,255,255,.055);overflow:hidden}.k-fill{height:100%;width:var(--width);border-radius:inherit;background:linear-gradient(90deg,var(--purple),var(--cyan));box-shadow:0 0 9px rgba(0,245,255,.3)}
+    .k-row.selected{color:#fff;font-weight:700}.k-row.selected .k-fill{background:linear-gradient(90deg,var(--cyan),var(--green))}
+    .guardrails{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1rem}
+    .guardrail{padding:1rem;border:1px solid rgba(0,255,136,.13);border-radius:14px;background:rgba(0,255,136,.035)}
+    .guardrail strong{display:block;color:var(--green);font-size:.76rem}.guardrail span{display:block;margin-top:.32rem;color:var(--muted);font-size:.72rem}
+
+    .insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .insight{position:relative;padding:1.6rem;overflow:hidden}
+    .insight-num{color:var(--purple);font-family:"Space Grotesk",sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em}
+    .insight h3{margin-top:1.1rem;font-size:1.13rem}.insight p{margin-top:.6rem;color:var(--muted);font-size:.82rem}
+    .insight .action{margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.07);color:rgba(240,240,255,.78);font-size:.75rem}.insight .action strong{color:var(--cyan)}
+
+    .cta{display:flex;align-items:center;justify-content:space-between;gap:2rem;padding:clamp(1.5rem,4vw,2.8rem);border-color:rgba(0,245,255,.18);background:radial-gradient(circle at 85% 20%,rgba(191,0,255,.13),transparent 34%),linear-gradient(135deg,rgba(0,245,255,.065),rgba(255,255,255,.022))}
+    .cta h2{font-size:clamp(1.55rem,3vw,2.5rem)}.cta p{margin-top:.4rem;color:var(--muted);font-size:.85rem}
+    .cta-actions{display:flex;gap:.65rem;flex-shrink:0}
+    footer{padding:2rem 0;color:var(--dim);font-size:.74rem;border-top:1px solid rgba(255,255,255,.06)}
+    .footer-inner{display:flex;justify-content:space-between;gap:1rem}.footer-inner a{text-decoration:none;color:var(--muted)}.footer-inner a:hover{color:var(--cyan)}
+
+    :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+    @media(max-width:980px){
+      .hero{grid-template-columns:1fr;min-height:auto}.hero-copy{max-width:700px}.cluster-orbit{width:min(92%,620px);margin-inline:auto}
+      .kpi-grid{grid-template-columns:repeat(2,1fr)}.lab-grid{grid-template-columns:1fr}.profile{border-left:0;border-top:1px solid var(--line)}.profile-desc{min-height:0}.profile-action{margin-top:1.2rem}
+      .pipeline{grid-template-columns:repeat(2,1fr)}.evaluation-grid{grid-template-columns:1fr}.insight-grid{grid-template-columns:1fr 1fr}.section-heading{grid-template-columns:1fr}
+    }
+    @media(max-width:700px){
+      .container{width:min(calc(100% - 1.4rem),var(--max))}.nav{height:64px}.brand span:last-child{display:none}.nav-link{padding:.58rem .72rem}.nav-link .nav-text{display:none}
+      .hero{padding-block:3.5rem}.hero-stat{min-width:100px;padding:.65rem}.hero-stat strong{font-size:1.05rem}
+      .lab-toolbar{align-items:flex-start;flex-direction:column}.segment-controls{width:100%}.segment-button{flex:1 1 calc(33.333% - .4rem);justify-content:center}
+      #segment-scatter{min-height:300px}.pipeline,.feature-grid,.insight-grid,.guardrails{grid-template-columns:1fr}.cta{align-items:flex-start;flex-direction:column}.cta-actions{flex-wrap:wrap}.footer-inner{flex-direction:column}
+    }
+    @media(max-width:470px){.kpi-grid,.scores{grid-template-columns:1fr}.segment-button{flex-basis:calc(50% - .4rem)}.profile-metrics{grid-template-columns:1fr}.cluster-orbit{width:100%}.hero-stat.two{right:0}.hero-stat.one{left:0}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+  <div class="grid-fade" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <nav class="nav container" aria-label="Project navigation">
+      <a class="brand" href="../../index.html#projects" aria-label="Viktor Paunovic portfolio projects">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="15" r="3"/><circle cx="16" cy="7" r="3"/><circle cx="17" cy="17" r="3"/><path d="m9.3 13 4.4-4M10 15.7l4 .8M16.4 10l.4 4"/></svg></span>
+        <span>Viktor Paunovic</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="../../index.html#projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg><span class="nav-text">All projects</span></a>
+        <a class="nav-link primary" href="../../index.html#links"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg><span>Contact</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero container" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">Machine learning case study</div>
+        <h1 id="page-title">Player <span class="gradient">Segmentation Model</span></h1>
+        <p class="hero-copy">A behaviour-led clustering framework that turns player activity into five clear, actionable audiences for retention, lifecycle and product teams.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#explorer">Explore the segments <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <a class="button" href="#method">View methodology</a>
+        </div>
+        <div class="tech-row" aria-label="Technologies used">
+          <span class="chip">Python</span><span class="chip">pandas</span><span class="chip">scikit-learn</span><span class="chip">BigQuery</span>
+        </div>
+      </div>
+
+      <div class="cluster-orbit" aria-hidden="true">
+        <svg viewBox="0 0 560 560" fill="none">
+          <defs>
+            <radialGradient id="coreGlow"><stop offset="0" stop-color="#bf00ff" stop-opacity=".24"/><stop offset="1" stop-color="#bf00ff" stop-opacity="0"/></radialGradient>
+            <filter id="nodeGlow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <circle cx="280" cy="280" r="210" stroke="rgba(0,245,255,.12)" stroke-dasharray="4 12"/>
+          <circle cx="280" cy="280" r="156" stroke="rgba(191,0,255,.14)"/>
+          <circle cx="280" cy="280" r="100" fill="url(#coreGlow)"/>
+          <g class="orbit-ring">
+            <circle cx="280" cy="70" r="6" fill="#00f5ff" filter="url(#nodeGlow)"/>
+            <circle cx="476" cy="204" r="4" fill="#bf00ff"/><circle cx="404" cy="450" r="5" fill="#00ff88"/>
+            <circle cx="112" cy="406" r="4" fill="#f5a623"/><circle cx="92" cy="188" r="5" fill="#ff5daf"/>
+          </g>
+          <g class="orbit-ring reverse">
+            <path d="M178 218c45-72 129-87 199-31M380 350c-48 56-132 66-197 21" stroke="rgba(0,245,255,.28)" stroke-dasharray="5 7"/>
+            <circle cx="179" cy="218" r="7" fill="#00f5ff" filter="url(#nodeGlow)"/>
+            <circle cx="377" cy="187" r="8" fill="#bf00ff" filter="url(#nodeGlow)"/>
+            <circle cx="380" cy="350" r="7" fill="#00ff88" filter="url(#nodeGlow)"/>
+            <circle cx="183" cy="371" r="6" fill="#f5a623" filter="url(#nodeGlow)"/>
+          </g>
+          <g opacity=".9">
+            <path d="m235 270 45-38 48 42 41-16M233 287l-51 84M282 233l-3 95M327 276l53 74" stroke="rgba(240,240,255,.16)"/>
+            <circle cx="280" cy="280" r="31" fill="rgba(191,0,255,.13)" stroke="#bf00ff" stroke-opacity=".58"/>
+            <circle cx="280" cy="280" r="7" fill="#fff" filter="url(#nodeGlow)"/>
+            <circle cx="235" cy="270" r="4" fill="#00f5ff"/><circle cx="280" cy="232" r="5" fill="#bf00ff"/><circle cx="328" cy="274" r="4" fill="#00ff88"/><circle cx="279" cy="328" r="4" fill="#f5a623"/>
+          </g>
+        </svg>
+        <div class="hero-stat one"><strong>48K</strong><span>Synthetic profiles</span></div>
+        <div class="hero-stat two"><strong>5</strong><span>Actionable segments</span></div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="notice" role="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <p><strong>Portfolio demonstration:</strong> every profile, metric and result on this page is invented synthetic data. It does not describe real players, a real operator or live model performance.</p>
+      </div>
+    </div>
+
+    <section class="section" id="explorer" aria-labelledby="explorer-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div><div class="eyebrow">Interactive explorer</div><h2 id="explorer-title">Five behaviours.<br>One usable view.</h2></div>
+          <p>Select a segment to isolate its representative points and inspect its synthetic profile. The two-dimensional map is a presentation view of scaled behavioural features, not a geographic map or causal model.</p>
+        </div>
+
+        <div class="kpi-grid reveal" aria-label="Synthetic model summary">
+          <article class="card kpi"><span class="kpi-label">Profiles analysed</span><strong class="kpi-value">48,000</strong><span class="kpi-foot">180-day feature window</span></article>
+          <article class="card kpi"><span class="kpi-label">Behavioural features</span><strong class="kpi-value">11</strong><span class="kpi-foot">Value, frequency &amp; recency</span></article>
+          <article class="card kpi"><span class="kpi-label">Selected clusters</span><strong class="kpi-value">5</strong><span class="kpi-foot">K-means solution</span></article>
+          <article class="card kpi"><span class="kpi-label">Silhouette score</span><strong class="kpi-value">0.61</strong><span class="kpi-foot">Illustrative validation result</span></article>
+        </div>
+
+        <article class="card lab reveal">
+          <div class="lab-toolbar">
+            <h3>Behavioural cluster map</h3>
+            <div class="segment-controls" id="segment-controls" aria-label="Filter cluster map"></div>
+          </div>
+          <div class="lab-grid">
+            <div class="scatter-wrap">
+              <svg id="segment-scatter" viewBox="0 0 700 420" role="img" aria-labelledby="scatter-title scatter-desc">
+                <title id="scatter-title">Synthetic player segment cluster map</title>
+                <desc id="scatter-desc">Representative synthetic profiles plotted by deposit frequency score and average session value score. Use the buttons above to highlight a segment.</desc>
+              </svg>
+              <noscript><p class="scatter-caption">JavaScript is disabled. The complete synthetic segment table remains available below.</p></noscript>
+            </div>
+            <aside class="profile" aria-live="polite" aria-atomic="true">
+              <span class="profile-overline" id="profile-overline">Portfolio dataset</span>
+              <h3 id="profile-title">All segments</h3>
+              <p class="profile-desc" id="profile-desc">A five-cluster view of 48,000 synthetic player profiles, designed to support clear lifecycle and product decisions.</p>
+              <div class="profile-metrics">
+                <div class="profile-metric"><span>Profiles</span><strong id="profile-count">48,000</strong></div>
+                <div class="profile-metric"><span>Dataset share</span><strong id="profile-share">100%</strong></div>
+                <div class="profile-metric"><span>Sessions / month</span><strong id="profile-sessions">11.0</strong></div>
+                <div class="profile-metric"><span>90-day retention</span><strong id="profile-retention">57%</strong></div>
+              </div>
+              <p class="profile-action"><strong>Recommended use</strong><span id="profile-action">Plan differentiated messaging, then validate every intervention with controlled experiments.</span></p>
+            </aside>
+          </div>
+          <p class="scatter-caption">Dots are a deterministic representative sample for visual clarity; the profile totals are the invented case-study population.</p>
+        </article>
+
+        <article class="card table-card reveal">
+          <div class="table-head"><h3>Segment profile summary</h3><span>Illustrative values only</span></div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th scope="col">Segment</th><th scope="col">Players</th><th scope="col">Share</th><th scope="col">Sessions / mo.</th><th scope="col">Avg. deposits / mo.</th><th scope="col">90-day retention</th></tr></thead>
+              <tbody id="segment-table"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="method" aria-labelledby="method-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div><div class="eyebrow">Methodology</div><h2 id="method-title">From raw events to stable audiences.</h2></div>
+          <p>The workflow separates feature construction, preprocessing, selection and interpretation so the result can be reproduced, reviewed and monitored.</p>
+        </div>
+
+        <div class="pipeline reveal">
+          <article class="card step"><h3>Build the feature mart</h3><p>Aggregate synthetic session, deposit and product events to one row per player in BigQuery, using a fixed 180-day observation window.</p></article>
+          <article class="card step"><h3>Prepare features</h3><p>Log-transform skewed monetary variables, cap extreme synthetic outliers, impute missing values and standardise all model inputs.</p></article>
+          <article class="card step"><h3>Compare solutions</h3><p>Fit K-means for k=3 to k=8 with a fixed seed and multiple initialisations, then compare separation, stability and usefulness.</p></article>
+          <article class="card step"><h3>Profile &amp; monitor</h3><p>Name clusters only after reviewing centroids. Track population drift and reassignment stability before operational use.</p></article>
+        </div>
+
+        <div class="feature-grid reveal">
+          <article class="card feature-card">
+            <h3><span aria-hidden="true">11</span> Model features</h3>
+            <div class="feature-list"><span class="feature">Days since last session</span><span class="feature">Sessions / 30d</span><span class="feature">Active days</span><span class="feature">Deposit frequency</span><span class="feature">Average deposit</span><span class="feature">Net revenue</span><span class="feature">Average stake</span><span class="feature">Product diversity</span><span class="feature">Bonus use rate</span><span class="feature">Session duration</span><span class="feature">Withdrawal ratio</span></div>
+          </article>
+          <article class="card feature-card">
+            <h3><span aria-hidden="true">&check;</span> Quality controls</h3>
+            <div class="feature-list"><span class="feature">One row per player</span><span class="feature">No future events</span><span class="feature">Duplicate checks</span><span class="feature">Missingness report</span><span class="feature">Fixed random seed</span><span class="feature">Versioned pipeline</span><span class="feature">Drift monitoring</span><span class="feature">Cluster size threshold</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="evaluation-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div><div class="eyebrow">Model evaluation</div><h2 id="evaluation-title">Useful beats merely optimal.</h2></div>
+          <p>The highest single score is not enough. The chosen solution should also remain stable across samples, produce meaningful cluster sizes and translate into distinct decisions.</p>
+        </div>
+
+        <div class="evaluation-grid reveal">
+          <article class="card score-panel">
+            <h3>Selected k=5 diagnostics</h3>
+            <div class="scores">
+              <div class="score"><strong>0.61</strong><span>Silhouette score</span></div>
+              <div class="score"><strong>0.72</strong><span>Davies-Bouldin index</span></div>
+              <div class="score"><strong>14,284</strong><span>Calinski-Harabasz score</span></div>
+              <div class="score"><strong>86%</strong><span>Bootstrap assignment stability</span></div>
+            </div>
+            <p class="score-note">All diagnostics are deliberately illustrative. Lower Davies-Bouldin is better; higher values are better for the other three metrics.</p>
+          </article>
+          <article class="card decision-panel">
+            <h3>Candidate silhouette comparison</h3>
+            <div class="k-list" aria-label="Illustrative silhouette scores by cluster count">
+              <div class="k-row"><span>k=3</span><div class="k-bar"><div class="k-fill" style="--width:77%"></div></div><span>0.54</span></div>
+              <div class="k-row"><span>k=4</span><div class="k-bar"><div class="k-fill" style="--width:83%"></div></div><span>0.58</span></div>
+              <div class="k-row selected"><span>k=5</span><div class="k-bar"><div class="k-fill" style="--width:87%"></div></div><span>0.61</span></div>
+              <div class="k-row"><span>k=6</span><div class="k-bar"><div class="k-fill" style="--width:81%"></div></div><span>0.57</span></div>
+              <div class="k-row"><span>k=7</span><div class="k-bar"><div class="k-fill" style="--width:76%"></div></div><span>0.53</span></div>
+            </div>
+            <div class="guardrails">
+              <div class="guardrail"><strong>Interpretability</strong><span>Each centroid has a clear behavioural story.</span></div>
+              <div class="guardrail"><strong>Stability</strong><span>Re-run assignments remain acceptably consistent.</span></div>
+              <div class="guardrail"><strong>Actionability</strong><span>Every segment maps to a distinct testable action.</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="insights-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div><div class="eyebrow">Business interpretation</div><h2 id="insights-title">Insights built for action.</h2></div>
+          <p>Segmentation is descriptive, not causal. These findings are hypotheses for prioritisation; campaign impact still requires consent-aware experimentation and incremental measurement.</p>
+        </div>
+        <div class="insight-grid reveal">
+          <article class="card insight"><span class="insight-num">01 / RETENTION</span><h3>Protect loyalty without over-incentivising.</h3><p>High-Value Loyal profiles represent 11% of the synthetic population and show the strongest retention. Their experience should emphasise reliability and relevance.</p><p class="action"><strong>Test:</strong> service-led recognition against standard bonus-led messaging.</p></article>
+          <article class="card insight"><span class="insight-num">02 / GROWTH</span><h3>Help promising new players form habits.</h3><p>New Growth profiles have encouraging engagement but lower maturity. Product education and well-timed discovery may be more useful than broad promotions.</p><p class="action"><strong>Test:</strong> personalised onboarding journeys with a holdout group.</p></article>
+          <article class="card insight"><span class="insight-num">03 / REACTIVATION</span><h3>Detect disengagement before it hardens.</h3><p>At-Risk profiles show low recent activity despite previous value signals. A light-touch, frequency-capped journey can test whether the decline is reversible.</p><p class="action"><strong>Test:</strong> channel and timing combinations, measured on incremental return.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="card cta reveal">
+          <div><h2>Want to discuss the analysis?</h2><p>I can walk through the feature design, model trade-offs and dashboard decisions.</p></div>
+          <div class="cta-actions"><a class="button primary" href="../../index.html#links">Contact me</a><a class="button" href="../../index.html#projects">More projects</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner"><span>&copy; <span id="year">2026</span> Viktor Paunovic. Built in Malta.</span><a href="../../index.html#projects">Back to portfolio</a></div>
+  </footer>
+
+  <script>
+    "use strict";
+
+    const segments = [
+      {id:"loyal",name:"High-Value Loyal",short:"High value",color:"#00f5ff",count:5280,share:11,sessions:25.8,deposits:820,retention:88,cx:565,cy:88,sx:54,sy:40,description:"Frequent, recent and high-value synthetic profiles with broad product engagement and consistent activity.",action:"Prioritise recognition, service quality and relevant experiences; avoid unnecessary incentive cost."},
+      {id:"regular",name:"Engaged Regulars",short:"Regulars",color:"#bf00ff",count:14880,share:31,sessions:15.2,deposits:340,retention:76,cx:438,cy:172,sx:70,sy:50,description:"Consistent synthetic profiles with healthy frequency, mid-range value and dependable repeat behaviour.",action:"Deepen product discovery and test personalised cross-sell journeys with controlled holdouts."},
+      {id:"growth",name:"New Growth",short:"New growth",color:"#00ff88",count:10560,share:22,sessions:9.4,deposits:185,retention:61,cx:330,cy:245,sx:58,sy:48,description:"Recently acquired synthetic profiles showing early momentum but not yet a stable long-term pattern.",action:"Use progressive onboarding and education to support habit formation without message overload."},
+      {id:"casual",name:"Casual Explorers",short:"Casual",color:"#f5a623",count:12960,share:27,sessions:4.1,deposits:72,retention:39,cx:205,cy:295,sx:68,sy:46,description:"Low-frequency synthetic profiles who sample products selectively and respond inconsistently over time.",action:"Keep communication low-frequency and test discovery content around demonstrated preferences."},
+      {id:"risk",name:"At-Risk Previously Active",short:"At risk",color:"#ff5daf",count:4320,share:9,sessions:2.3,deposits:95,retention:18,cx:292,cy:120,sx:60,sy:38,description:"Previously active synthetic profiles with a sharp recency decline and lower current engagement.",action:"Test a respectful, frequency-capped reactivation journey and suppress persistent non-responders."}
+    ];
+
+    const svg = document.getElementById("segment-scatter");
+    const ns = "http://www.w3.org/2000/svg";
+    const plot = {left:62,right:674,top:24,bottom:365};
+    const makeSvg = (tag,attrs,parent=svg) => {
+      const node=document.createElementNS(ns,tag);
+      Object.entries(attrs).forEach(([key,value])=>node.setAttribute(key,String(value)));
+      parent.appendChild(node);return node;
+    };
+    const mulberry32 = seed => () => {seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296};
+    const random=mulberry32(92741);
+
+    const gridGroup=makeSvg("g",{"aria-hidden":"true"});
+    for(let i=0;i<=5;i++){
+      const x=plot.left+(plot.right-plot.left)*(i/5),y=plot.top+(plot.bottom-plot.top)*(i/5);
+      makeSvg("line",{x1:x,y1:plot.top,x2:x,y2:plot.bottom,class:"grid-line"},gridGroup);
+      makeSvg("line",{x1:plot.left,y1:y,x2:plot.right,y2:y,class:"grid-line"},gridGroup);
+    }
+    const xLabel=makeSvg("text",{x:(plot.left+plot.right)/2,y:407,"text-anchor":"middle",class:"axis-label"},gridGroup);xLabel.textContent="Deposit frequency score  ->";
+    const yLabel=makeSvg("text",{x:17,y:(plot.top+plot.bottom)/2,"text-anchor":"middle",class:"axis-label",transform:`rotate(-90 17 ${(plot.top+plot.bottom)/2})`},gridGroup);yLabel.textContent="Average session value score  ->";
+
+    const pointGroup=makeSvg("g",{});
+    segments.forEach((segment,segmentIndex)=>{
+      const cluster=makeSvg("g",{"data-segment":segment.id},pointGroup);
+      const sampleCount=[15,25,19,22,13][segmentIndex];
+      for(let i=0;i<sampleCount;i++){
+        const angle=random()*Math.PI*2;
+        const radius=Math.sqrt(random());
+        const x=Math.max(plot.left+7,Math.min(plot.right-7,segment.cx+Math.cos(angle)*segment.sx*radius+(random()-.5)*12));
+        const y=Math.max(plot.top+7,Math.min(plot.bottom-7,segment.cy+Math.sin(angle)*segment.sy*radius+(random()-.5)*10));
+        const pointRadius=(3.3+random()*2.5).toFixed(1);
+        makeSvg("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r:pointRadius,fill:segment.color,"fill-opacity":(.38+random()*.45).toFixed(2),class:"scatter-point","data-segment":segment.id,"data-radius":pointRadius},cluster);
+      }
+      makeSvg("circle",{cx:segment.cx,cy:segment.cy,r:17,fill:segment.color,"fill-opacity":".08",stroke:segment.color,"stroke-opacity":".65","stroke-dasharray":"3 3"},cluster);
+      const label=makeSvg("text",{x:segment.cx+15,y:segment.cy-16,fill:segment.color,class:"scatter-label"},cluster);label.textContent=segment.short;
+    });
+
+    const controls=document.getElementById("segment-controls");
+    const choices=[{id:"all",name:"All",color:"#f0f0ff"},...segments];
+    choices.forEach((item,index)=>{
+      const button=document.createElement("button");
+      button.type="button";button.className="segment-button";button.dataset.segment=item.id;button.textContent=item.name;
+      button.style.setProperty("--dot",item.color);button.setAttribute("aria-pressed",index===0?"true":"false");
+      button.addEventListener("click",()=>selectSegment(item.id));controls.appendChild(button);
+    });
+
+    const table=document.getElementById("segment-table");
+    segments.forEach(segment=>{
+      const row=document.createElement("tr");
+      const values=[segment.count.toLocaleString("en-GB"),`${segment.share}%`,segment.sessions.toFixed(1),`\u20ac${segment.deposits.toLocaleString("en-GB")}`,`${segment.retention}%`];
+      const name=document.createElement("td");
+      const nameWrap=document.createElement("span");nameWrap.className="row-name";nameWrap.style.setProperty("--row-color",segment.color);
+      const dot=document.createElement("span");dot.className="row-dot";dot.setAttribute("aria-hidden","true");nameWrap.append(dot,document.createTextNode(segment.name));name.appendChild(nameWrap);row.appendChild(name);
+      values.forEach((value,i)=>{const cell=document.createElement("td");cell.textContent=value;if(i===4)cell.className="retention";row.appendChild(cell)});table.appendChild(row);
+    });
+
+    const profile={
+      overline:document.getElementById("profile-overline"),title:document.getElementById("profile-title"),desc:document.getElementById("profile-desc"),count:document.getElementById("profile-count"),share:document.getElementById("profile-share"),sessions:document.getElementById("profile-sessions"),retention:document.getElementById("profile-retention"),action:document.getElementById("profile-action")
+    };
+    function selectSegment(id){
+      const selected=segments.find(segment=>segment.id===id);
+      document.querySelectorAll(".segment-button").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.segment===id)));
+      document.querySelectorAll(".scatter-point").forEach(point=>{
+        const active=id==="all"||point.dataset.segment===id;
+        point.style.opacity=active?"1":".08";point.setAttribute("r",active?point.dataset.radius:"2.4");point.style.filter=selected&&active?`drop-shadow(0 0 5px ${selected.color})`:"none";
+      });
+      document.querySelectorAll("#segment-scatter g[data-segment]").forEach(group=>{group.style.opacity=id==="all"||group.dataset.segment===id?"1":".16"});
+      if(!selected){
+        profile.overline.textContent="Portfolio dataset";profile.title.textContent="All segments";profile.title.style.color="";profile.desc.textContent="A five-cluster view of 48,000 synthetic player profiles, designed to support clear lifecycle and product decisions.";profile.count.textContent="48,000";profile.share.textContent="100%";profile.sessions.textContent="11.0";profile.retention.textContent="57%";profile.action.textContent="Plan differentiated messaging, then validate every intervention with controlled experiments.";return;
+      }
+      profile.overline.textContent="Selected segment";profile.title.textContent=selected.name;profile.title.style.color=selected.color;profile.desc.textContent=selected.description;profile.count.textContent=selected.count.toLocaleString("en-GB");profile.share.textContent=`${selected.share}%`;profile.sessions.textContent=selected.sessions.toFixed(1);profile.retention.textContent=`${selected.retention}%`;profile.action.textContent=selected.action;
+    }
+
+    const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+    const revealItems=document.querySelectorAll(".reveal");
+    if(reduceMotion.matches||!("IntersectionObserver" in window)){revealItems.forEach(item=>item.classList.add("in-view"))}
+    else{
+      const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target)}}),{threshold:.12});
+      revealItems.forEach(item=>observer.observe(item));
+    }
+
+    document.getElementById("year").textContent=String(new Date().getFullYear());
+
+    (()=>{
+      const canvas=document.getElementById("particle-canvas"),context=canvas.getContext("2d");
+      if(!context)return;
+      let width=0,height=0,animationId=0,visible=true;
+      const count=window.innerWidth<700?24:44;
+      const particles=Array.from({length:count},(_,i)=>({x:random()*window.innerWidth,y:random()*window.innerHeight,vx:(random()-.5)*.18,vy:(random()-.5)*.18,r:random()*1.2+.45,color:i%3===0?"191,0,255":"0,245,255"}));
+      function resize(){const ratio=Math.min(window.devicePixelRatio||1,2);width=window.innerWidth;height=window.innerHeight;canvas.width=Math.floor(width*ratio);canvas.height=Math.floor(height*ratio);canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;context.setTransform(ratio,0,0,ratio,0,0)}
+      function draw(){
+        if(!visible||reduceMotion.matches){animationId=0;return}
+        context.clearRect(0,0,width,height);
+        particles.forEach((particle,i)=>{
+          particle.x+=particle.vx;particle.y+=particle.vy;if(particle.x<0)particle.x=width;if(particle.x>width)particle.x=0;if(particle.y<0)particle.y=height;if(particle.y>height)particle.y=0;
+          context.beginPath();context.arc(particle.x,particle.y,particle.r,0,Math.PI*2);context.fillStyle=`rgba(${particle.color},.18)`;context.fill();
+          for(let j=i+1;j<particles.length;j++){const other=particles[j],dx=particle.x-other.x,dy=particle.y-other.y,distanceSquared=dx*dx+dy*dy;if(distanceSquared<10000){context.beginPath();context.moveTo(particle.x,particle.y);context.lineTo(other.x,other.y);context.strokeStyle=`rgba(0,245,255,${.045*(1-Math.sqrt(distanceSquared)/100)})`;context.lineWidth=.5;context.stroke()}}
+        });
+        animationId=requestAnimationFrame(draw);
+      }
+      document.addEventListener("visibilitychange",()=>{visible=!document.hidden;if(visible&&!animationId&&!reduceMotion.matches)draw()});
+      window.addEventListener("resize",resize,{passive:true});resize();if(!reduceMotion.matches)draw();
+    })();
+  </script>
+</body>
+</html>

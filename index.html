@@ -481,7 +481,7 @@ footer{padding:2rem 6%;text-align:center;font-size:.78rem;color:rgba(255,255,255
       <span class="mc-time" id="malta-time">--:--:--</span>
       <span class="mc-zone">Malta · CET</span>
     </div>
-    <a href="#" class="btn-cv"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download CV</a>
+    <a href="#links" class="btn-cv"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>Contact Me</a>
   </div>
   <div class="hero-body">
     <div class="hero-left">
@@ -577,6 +577,25 @@ footer{padding:2rem 6%;text-align:center;font-size:.78rem;color:rgba(255,255,255
     </div>
   </div>
 </section>
+
+<script>
+/* Keep the portfolio card markup unchanged while routing each project to its case-study page. */
+(() => {
+  const projectPages = Object.freeze({
+    'iGaming KPI Dashboard': 'projects/igaming-kpi-dashboard/',
+    'Player Segmentation Model': 'projects/player-segmentation-model/',
+    'Revenue Trend Report': 'projects/revenue-trend-report/'
+  });
+
+  document.querySelectorAll('#projects .proj-card').forEach(card => {
+    const title = card.querySelector('.proj-title')?.textContent.trim();
+    const link = card.querySelector('.proj-link');
+    if (!title || !link || !projectPages[title]) return;
+    link.href = projectPages[title];
+    link.setAttribute('aria-label', `View ${title} project`);
+  });
+})();
+</script>
 
 <div class="divider"></div>
 <section id="education" class="section">

@@ -1,6 +1,6 @@
 # Viktor Paunovic — Data Analyst Portfolio
 
-A single-page personal portfolio built as a self-contained `index.html` — no build step, no dependencies to install. Just open and edit.
+A static personal portfolio with a self-contained home page and three project case-study pages. There is no build step or dependency installation; just open and edit the HTML files.
 
 **Live demo:** _(add your Netlify URL here after deploying)_
 
@@ -16,6 +16,7 @@ A single-page personal portfolio built as a self-contained `index.html` — no b
 - Mobile hamburger drawer with staggered link animation
 - Scroll progress bar, Web Audio click/whoosh SFX
 - Glassmorphism dark theme (cyan / purple / green)
+- Three responsive project case studies with clearly labelled synthetic demonstration data
 
 ---
 
@@ -90,22 +91,11 @@ You lose auto-redeploys this way — every update means dragging the folder agai
 
 ---
 
-## Before going live — fill in these placeholders
+## Project data and links
 
-Open `index.html` and search-and-replace:
+The three project cards are connected to their case-study pages by a small script immediately after the unchanged Projects section in `index.html`.
 
-| Find | Replace with |
-|---|---|
-| `YOUR_FORM_ID` (line ~459, in the contact form) | Your Formspree form ID — get one free at https://formspree.io |
-| `Your University Name` | Your real university |
-| `Bachelor's Degree in [Your Field]` | Your real degree |
-| `Year of Graduation` | The year |
-| `viktor@email.com` (appears twice) | Your real email |
-| `linkedin.com/in/viktor-paunovic` (appears in 2 places) | Your real LinkedIn URL |
-| `github.com/viktor` | Your real GitHub URL |
-| `href="#"` on the three project cards | Real project links |
-
-The Download CV button (`<a href="#" class="btn-cv">`) should point at a hosted PDF — easiest path: upload your CV PDF to the project folder as `cv.pdf` and change the link to `href="cv.pdf" download`.
+All project metrics are invented, synthetic demonstration data. Replace them with validated source data before presenting the pages as real business results.
 
 ---
 
@@ -129,8 +119,17 @@ Then open http://localhost:3000 (or 8080).
 
 ```
 portfolio/
-  index.html       ← entire site (HTML + CSS + JS + React + Three.js, all inline)
-  README.md        ← you're reading it
+  index.html                        ← portfolio home page
+  projects/
+    igaming-kpi-dashboard/
+      index.html                    ← iGaming KPI case study
+    player-segmentation-model/
+      index.html                    ← player clustering case study
+    revenue-trend-report/
+      index.html                    ← revenue reporting case study
+  sitemap.xml                       ← public URLs for search engines
+  robots.txt                        ← crawler rules and sitemap location
+  README.md                         ← you're reading it
 ```
 
-That's literally the whole project. No build step, no dependencies, no framework lock-in.
+No build step, package manager, or framework lock-in is required.

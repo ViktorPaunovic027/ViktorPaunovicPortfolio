@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iGaming KPI Dashboard | Viktor Paunovic</title>
+  <meta name="description" content="An interactive iGaming KPI dashboard case study by Viktor Paunovic, built with clearly labelled synthetic data.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://viktorpaunovic.com/projects/igaming-kpi-dashboard/">
+  <meta property="og:title" content="iGaming KPI Dashboard | Viktor Paunovic">
+  <meta property="og:description" content="An interactive iGaming KPI dashboard case study built with clearly labelled synthetic data.">
+  <meta property="og:site_name" content="Viktor Paunovic Portfolio">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://viktorpaunovic.com/projects/igaming-kpi-dashboard/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Cpath d='M13 46V31h8v15zm15 0V20h8v26zm15 0V12h8v34z' fill='%2300f5ff'/%3E%3C/svg%3E">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a0f;--panel:#111119;--panel-2:#0d151d;--line:rgba(255,255,255,.085);
+      --cyan:#00f5ff;--purple:#bf00ff;--green:#00ff88;--amber:#f5a623;--red:#ff577f;
+      --white:#f3f4ff;--muted:rgba(240,240,255,.58);--soft:rgba(240,240,255,.76);
+      --radius:18px;--shadow:0 24px 60px rgba(0,0,0,.24)
+    }
+    html{scroll-behavior:smooth;scroll-padding-top:90px}
+    body{min-width:280px;background:var(--bg);color:var(--white);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.55;overflow-x:hidden}
+    button,select,a{font:inherit}
+    a{color:inherit}
+    button,select{color:inherit}
+    button{cursor:pointer}
+    ::selection{background:rgba(0,245,255,.26);color:#fff}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(0,245,255,.32);border-radius:4px}
+    .skip-link{position:fixed;left:1rem;top:-5rem;z-index:100;background:var(--cyan);color:#001316;padding:.7rem 1rem;border-radius:8px;font-weight:800;text-decoration:none;transition:top .2s}
+    .skip-link:focus{top:1rem}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    #ambient{position:fixed;inset:0;width:100%;height:100%;z-index:-3;pointer-events:none}
+    .aurora{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(circle at 8% 8%,rgba(0,245,255,.08),transparent 30%),radial-gradient(circle at 91% 27%,rgba(191,0,255,.08),transparent 28%),linear-gradient(rgba(10,10,15,.78),rgba(10,10,15,.96))}
+    .grid-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(0,245,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,.022) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(to bottom,black,transparent 72%)}
+    .shell{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+
+    .topbar{position:sticky;top:0;z-index:40;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(10,10,15,.76);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;font-weight:800;letter-spacing:-.02em}
+    .brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(0,245,255,.3);border-radius:10px;background:linear-gradient(145deg,rgba(0,245,255,.14),rgba(191,0,255,.1));color:var(--cyan);box-shadow:0 0 20px rgba(0,245,255,.08)}
+    .brand-mark svg{width:18px}
+    .brand small{display:block;color:var(--muted);font-size:.6rem;line-height:1.1;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+    .nav-actions{display:flex;align-items:center;gap:.6rem}
+    .nav-link,.button{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:40px;border-radius:999px;padding:.58rem 1rem;text-decoration:none;font-size:.8rem;font-weight:700;letter-spacing:.02em;transition:transform .2s,border-color .2s,background .2s,color .2s,box-shadow .2s}
+    .nav-link{color:var(--soft);border:1px solid var(--line);background:rgba(255,255,255,.025)}
+    .button{border:1px solid rgba(0,245,255,.33);color:#001114;background:var(--cyan);box-shadow:0 8px 28px rgba(0,245,255,.14)}
+    .nav-link:hover,.nav-link:focus-visible{color:#fff;border-color:rgba(0,245,255,.34);background:rgba(0,245,255,.07)}
+    .button:hover,.button:focus-visible{transform:translateY(-2px);box-shadow:0 12px 34px rgba(0,245,255,.28)}
+    :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+    .hero{padding:6.8rem 0 4.5rem;position:relative}
+    .hero::after{content:"";position:absolute;left:54%;top:17%;width:44vw;height:44vw;max-width:600px;max-height:600px;background:radial-gradient(circle,rgba(0,245,255,.075),rgba(191,0,255,.025) 43%,transparent 70%);filter:blur(4px);pointer-events:none}
+    .breadcrumbs{display:flex;align-items:center;gap:.55rem;color:var(--muted);font-size:.76rem;margin-bottom:1.8rem}
+    .breadcrumbs a{text-decoration:none}.breadcrumbs a:hover{color:var(--cyan)}
+    .eyebrow{display:flex;align-items:center;gap:.65rem;color:var(--cyan);font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.18em}
+    .eyebrow::before{content:"";width:28px;height:1px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+    h1{max-width:880px;margin:.9rem 0 1.2rem;font-size:clamp(2.7rem,8vw,6.4rem);line-height:.94;letter-spacing:-.055em;font-weight:800}
+    h1 span{background:linear-gradient(105deg,#fff 18%,var(--cyan) 60%,#9a7cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-copy{max-width:710px;color:var(--soft);font-size:clamp(.98rem,2vw,1.14rem)}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:1.65rem}
+    .pill{display:inline-flex;align-items:center;gap:.45rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);padding:.46rem .78rem;color:var(--soft);font-size:.72rem;font-weight:700}
+    .pill i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+    .pill.synthetic{border-color:rgba(245,166,35,.27);color:#ffd78d;background:rgba(245,166,35,.07)}
+    .hero-notice{margin-top:2.2rem;max-width:860px;display:flex;gap:.8rem;padding:1rem 1.1rem;border:1px solid rgba(245,166,35,.23);border-radius:14px;background:linear-gradient(90deg,rgba(245,166,35,.08),rgba(245,166,35,.025));color:rgba(255,229,182,.82);font-size:.79rem}
+    .hero-notice svg{width:18px;height:18px;flex:0 0 auto;color:var(--amber);margin-top:1px}
+
+    .section{padding:2rem 0 5.5rem}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.4rem}
+    .section-kicker{color:var(--cyan);font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.17em;margin-bottom:.35rem}
+    h2{font-size:clamp(1.6rem,3.5vw,2.45rem);line-height:1.08;letter-spacing:-.035em}
+    .section-note{max-width:470px;color:var(--muted);font-size:.82rem;text-align:right}
+    .glass{background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+
+    .dashboard{padding:1.25rem;position:relative;overflow:hidden}
+    .dashboard::before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent);opacity:.5}
+    .dash-toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.2rem .15rem 1.2rem;border-bottom:1px solid var(--line)}
+    .dash-title{display:flex;align-items:center;gap:.7rem;font-size:.82rem;font-weight:800}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(0,255,136,.5);animation:pulse 2.2s infinite}
+    @keyframes pulse{55%{box-shadow:0 0 0 8px rgba(0,255,136,0)}}
+    .filters{display:flex;align-items:center;justify-content:flex-end;gap:.55rem;flex-wrap:wrap}
+    .segmented{display:flex;gap:.22rem;border:1px solid var(--line);padding:3px;border-radius:999px;background:rgba(0,0,0,.18)}
+    .range-btn{border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:.69rem;font-weight:800;padding:.43rem .68rem;transition:.2s}
+    .range-btn:hover{color:#fff}.range-btn.active{background:rgba(0,245,255,.13);color:var(--cyan);box-shadow:inset 0 0 0 1px rgba(0,245,255,.24)}
+    .filter-select{min-height:34px;border:1px solid var(--line);border-radius:999px;background:#11121a;padding:.3rem 2rem .3rem .75rem;color:var(--soft);font-size:.7rem;font-weight:700}
+
+    .kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.85rem;margin:1.15rem 0}
+    .kpi{position:relative;min-width:0;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(8,9,15,.56);overflow:hidden}
+    .kpi::after{content:"";position:absolute;left:0;bottom:0;width:52%;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);opacity:.6}
+    .kpi:nth-child(2n)::after{background:linear-gradient(90deg,var(--purple),transparent)}
+    .kpi-label{display:flex;align-items:center;gap:.35rem;color:var(--muted);font-size:.65rem;font-weight:700;white-space:nowrap}
+    .info{display:inline-grid;place-items:center;width:14px;height:14px;border:1px solid rgba(255,255,255,.15);border-radius:50%;font-size:.52rem;color:rgba(255,255,255,.5)}
+    .kpi-value{display:block;margin:.42rem 0 .15rem;font-size:clamp(1.18rem,2.2vw,1.75rem);line-height:1;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+    .delta{display:flex;align-items:center;gap:.25rem;font-size:.63rem;color:var(--green);font-weight:800}.delta.down{color:var(--red)}.delta small{color:var(--muted);font-weight:600}
+
+    .chart-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(245px,.7fr);gap:.85rem}
+    .chart-card{min-width:0;border:1px solid var(--line);border-radius:14px;background:rgba(8,9,15,.54);padding:1rem}
+    .chart-head{display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:.8rem}
+    .chart-head h3{font-size:.87rem}.chart-sub{color:var(--muted);font-size:.65rem;margin-top:.18rem}
+    .chart-total{text-align:right;font-size:.65rem;color:var(--muted)}.chart-total b{display:block;color:var(--green);font-size:.8rem}
+    #revenue-chart{display:block;width:100%;height:auto;overflow:visible}
+    .grid-line{stroke:rgba(255,255,255,.07);stroke-width:1}.axis-label{fill:rgba(240,240,255,.38);font-size:10px;font-family:Inter,"Segoe UI",sans-serif}.area{fill:url(#areaGradient)}.trend-line{fill:none;stroke:var(--cyan);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px rgba(0,245,255,.35))}.trend-point{fill:#0a0a0f;stroke:var(--cyan);stroke-width:2;transition:r .15s}.trend-point:hover{r:5}
+    .chart-tooltip{position:fixed;z-index:80;pointer-events:none;display:none;padding:.55rem .65rem;border:1px solid rgba(0,245,255,.24);border-radius:9px;background:rgba(8,8,14,.94);box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:.7rem;color:var(--soft);transform:translate(10px,-110%)}
+    .chart-tooltip b{display:block;color:var(--cyan);font-size:.78rem}
+    .mix-wrap{display:grid;place-items:center;min-height:205px;position:relative}
+    .donut{width:156px;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--cyan) 0 44%,var(--purple) 44% 73%,var(--green) 73% 90%,var(--amber) 90% 100%);position:relative;box-shadow:0 0 35px rgba(0,245,255,.08)}
+    .donut::before{content:"";position:absolute;inset:24%;border-radius:50%;background:#0c0d14;border:1px solid var(--line)}
+    .donut-copy{position:absolute;text-align:center;font-size:.62rem;color:var(--muted)}.donut-copy b{display:block;color:#fff;font-size:1.15rem}
+    .legend{display:grid;grid-template-columns:1fr 1fr;gap:.55rem .7rem;width:100%;margin-top:.55rem}
+    .legend-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:.65rem;color:var(--muted)}
+    .legend-name{display:flex;align-items:center;gap:.35rem;white-space:nowrap}.swatch{width:7px;height:7px;border-radius:2px}.legend-item b{color:var(--soft);font-size:.68rem}
+
+    .lower-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:.85rem;margin-top:.85rem}
+    .source-row{display:grid;grid-template-columns:92px 1fr 42px;align-items:center;gap:.7rem;margin:.74rem 0;font-size:.68rem;color:var(--soft)}
+    .source-track{height:7px;border-radius:99px;background:rgba(255,255,255,.055);overflow:hidden}.source-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple),var(--cyan));box-shadow:0 0 10px rgba(0,245,255,.18);transform-origin:left;animation:grow .8s both}@keyframes grow{from{transform:scaleX(0)}}.source-value{text-align:right;font-variant-numeric:tabular-nums;color:var(--cyan);font-weight:800}
+    .rg-list{display:grid;gap:.65rem}.rg-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.65rem;border:1px solid var(--line);border-radius:11px;padding:.62rem .7rem;background:rgba(255,255,255,.018)}
+    .rg-icon{display:grid;place-items:center;width:29px;height:29px;border-radius:8px;background:rgba(0,255,136,.08);color:var(--green)}.rg-icon.amber{color:var(--amber);background:rgba(245,166,35,.08)}.rg-icon svg{width:15px}
+    .rg-name{font-size:.68rem;font-weight:750}.rg-detail{font-size:.59rem;color:var(--muted)}.rg-metric{text-align:right;font-size:.7rem;font-weight:800;color:var(--green)}.rg-metric.amber{color:var(--amber)}
+    .synthetic-foot{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:1rem;color:var(--muted);font-size:.62rem}
+
+    .cohort-card{padding:1.2rem;overflow:hidden}
+    .cohort-scroll{overflow-x:auto;padding-bottom:.35rem}
+    .cohort-table{width:100%;min-width:700px;border-spacing:5px;border-collapse:separate;font-size:.67rem;text-align:center}
+    .cohort-table th{color:var(--muted);font-weight:700;padding:.38rem}.cohort-table th:first-child,.cohort-table td:first-child{text-align:left;padding-left:.55rem;color:var(--soft);white-space:nowrap}
+    .cohort-table td{height:39px;border-radius:7px;font-variant-numeric:tabular-nums;font-weight:750;color:rgba(255,255,255,.82)}
+    .heat-10{background:rgba(0,245,255,.52)}.heat-9{background:rgba(0,245,255,.40)}.heat-8{background:rgba(0,245,255,.32)}.heat-7{background:rgba(0,245,255,.25)}.heat-6{background:rgba(0,245,255,.20)}.heat-5{background:rgba(0,245,255,.15)}.heat-4{background:rgba(0,245,255,.11)}.heat-na{background:rgba(255,255,255,.025);color:rgba(255,255,255,.18)!important}
+    .cohort-legend{display:flex;align-items:center;justify-content:flex-end;gap:.32rem;margin-top:.7rem;color:var(--muted);font-size:.6rem}.heat-key{width:19px;height:9px;border-radius:2px}
+
+    .story-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .story-card{padding:1.35rem;position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+    .story-card:hover{transform:translateY(-4px);border-color:rgba(0,245,255,.2)}
+    .story-number{position:absolute;right:1rem;top:.45rem;color:rgba(255,255,255,.04);font-size:4rem;font-weight:900;line-height:1}
+    .story-label{display:inline-flex;border-radius:99px;padding:.25rem .48rem;margin-bottom:.8rem;background:rgba(0,245,255,.08);color:var(--cyan);font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+    .story-card:nth-child(2) .story-label{color:#d779ff;background:rgba(191,0,255,.08)}.story-card:nth-child(3) .story-label{color:var(--green);background:rgba(0,255,136,.08)}
+    .story-card h3{font-size:1rem;margin-bottom:.55rem;max-width:86%}.story-card p{font-size:.76rem;color:var(--muted)}
+    .action{display:flex;gap:.5rem;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--line);font-size:.68rem;color:var(--soft)}.action b{color:var(--cyan);white-space:nowrap}
+
+    .method{display:grid;grid-template-columns:.85fr 1.15fr;gap:1rem}
+    .method-copy,.pipeline{padding:1.5rem}
+    .method-copy h2{margin:.35rem 0 .8rem}.method-copy p{color:var(--muted);font-size:.82rem}.tech-list{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1.2rem}.tech{padding:.35rem .58rem;border:1px solid rgba(0,245,255,.16);border-radius:999px;background:rgba(0,245,255,.04);font-size:.65rem;color:var(--cyan);font-weight:700}
+    .pipeline{display:grid;gap:.55rem}.pipe-step{display:grid;grid-template-columns:34px 1fr;gap:.7rem;align-items:center;padding:.68rem;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.018)}
+    .pipe-num{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:linear-gradient(145deg,rgba(0,245,255,.12),rgba(191,0,255,.1));color:var(--cyan);font-size:.65rem;font-weight:900}.pipe-step h3{font-size:.73rem}.pipe-step p{font-size:.63rem;color:var(--muted)}
+
+    .cta{margin-bottom:7rem;padding:2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;position:relative;overflow:hidden}
+    .cta::after{content:"";position:absolute;right:-80px;top:-110px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,245,255,.15),transparent 68%)}
+    .cta-copy{position:relative;z-index:1}.cta h2{margin-bottom:.4rem}.cta p{color:var(--muted);font-size:.82rem;max-width:620px}.cta-actions{position:relative;z-index:1;display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end}
+    .button.secondary{color:#fff;background:rgba(255,255,255,.035);border-color:var(--line);box-shadow:none}.button.secondary:hover{border-color:rgba(0,245,255,.3);background:rgba(0,245,255,.06)}
+    footer{border-top:1px solid var(--line);padding:1.8rem 0 2.4rem;color:rgba(255,255,255,.32);font-size:.68rem}.footer-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}.footer-row a{text-decoration:none}.footer-row a:hover{color:var(--cyan)}
+
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}.reveal.visible{opacity:1;transform:none}
+    @media(max-width:1050px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.story-grid{grid-template-columns:1fr 1fr}.story-card:last-child{grid-column:1/-1}.method{grid-template-columns:1fr}.chart-grid{grid-template-columns:minmax(0,1.5fr) minmax(230px,.75fr)}}
+    @media(max-width:760px){.shell{width:min(100% - 28px,1180px)}.hero{padding-top:4.5rem}.nav-link.hide-small{display:none}.section{padding-bottom:4rem}.section-head{display:block}.section-note{text-align:left;margin-top:.6rem}.dash-toolbar{align-items:flex-start;flex-direction:column}.filters{justify-content:flex-start}.kpi-grid{grid-template-columns:repeat(2,1fr)}.chart-grid,.lower-grid{grid-template-columns:1fr}.mix-wrap{min-height:185px}.story-grid{grid-template-columns:1fr}.story-card:last-child{grid-column:auto}.cta{align-items:flex-start;flex-direction:column}.cta-actions{justify-content:flex-start}.footer-row{align-items:flex-start;flex-direction:column}.source-row{grid-template-columns:82px 1fr 40px}}
+    @media(max-width:430px){.shell{width:min(100% - 20px,1180px)}.brand-text{display:none}.nav{height:64px}.hero{padding-top:3.8rem}h1{font-size:2.65rem}.dashboard{padding:.75rem}.kpi-grid{gap:.55rem}.kpi{padding:.8rem}.kpi-label{font-size:.58rem}.kpi-value{font-size:1.22rem}.chart-card{padding:.8rem}.filter-select{width:100%}.filters{width:100%}.segmented{width:100%}.range-btn{flex:1}.cta{padding:1.3rem}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <canvas id="ambient" aria-hidden="true"></canvas>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <nav class="nav shell" aria-label="Project navigation">
+      <a class="brand" href="../../index.html#projects" aria-label="Back to Viktor Paunovic portfolio projects">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9m6 10V4m6 15v-7m4 7H2"/></svg></span>
+        <span class="brand-text">Viktor Paunovic<small>Analytics portfolio</small></span>
+      </a>
+      <div class="nav-actions">
+        <a class="nav-link hide-small" href="#methodology">Methodology</a>
+        <a class="nav-link" href="../../index.html#projects">← Projects</a>
+        <a class="button" href="../../index.html#links">Contact me</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="hero shell">
+      <div class="breadcrumbs" aria-label="Breadcrumb"><a href="../../index.html">Portfolio</a><span aria-hidden="true">/</span><a href="../../index.html#projects">Projects</a><span aria-hidden="true">/</span><span>iGaming KPI Dashboard</span></div>
+      <div class="eyebrow">Business intelligence case study</div>
+      <h1>iGaming KPI <span>Dashboard</span></h1>
+      <p class="hero-copy">A decision-focused analytics experience connecting acquisition, player activity, revenue, retention and safer-gambling signals in one executive view.</p>
+      <div class="hero-meta" aria-label="Project details">
+        <span class="pill"><i></i> Interactive demo</span>
+        <span class="pill">SQL · Tableau · Python</span>
+        <span class="pill">Jan–Jun 2026 sample period</span>
+        <span class="pill synthetic">Synthetic data only</span>
+      </div>
+      <div class="hero-notice" role="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-9h.01"/></svg>
+        <p><strong>Illustrative portfolio project.</strong> Every player count, market, trend and monetary value on this page is invented for demonstration. It does not represent a real operator, customer or production dataset.</p>
+      </div>
+    </section>
+
+    <section class="section shell reveal" aria-labelledby="dashboard-title">
+      <div class="section-head">
+        <div><div class="section-kicker">Interactive overview</div><h2 id="dashboard-title">Executive performance cockpit</h2></div>
+        <p class="section-note">Change the period and market to explore a deterministic synthetic scenario. Comparisons use the preceding equivalent period.</p>
+      </div>
+      <div class="dashboard glass">
+        <div class="dash-toolbar">
+          <div class="dash-title"><span class="live-dot" aria-hidden="true"></span>Portfolio analytics demo <span class="pill synthetic">Dummy</span></div>
+          <div class="filters" aria-label="Dashboard filters">
+            <div class="segmented" role="group" aria-label="Reporting period">
+              <button class="range-btn" type="button" data-range="30">30D</button>
+              <button class="range-btn active" type="button" data-range="90" aria-pressed="true">90D</button>
+              <button class="range-btn" type="button" data-range="180">180D</button>
+            </div>
+            <label><span class="sr-only">Market</span><select class="filter-select" id="market-filter" aria-label="Market"><option value="all">All markets</option><option value="uk">United Kingdom</option><option value="de">Germany</option><option value="fi">Finland</option><option value="ca">Canada</option></select></label>
+          </div>
+        </div>
+
+        <div class="kpi-grid" aria-live="polite">
+          <article class="kpi"><span class="kpi-label">Gross gaming revenue <span class="info" title="Stakes less winnings">i</span></span><strong class="kpi-value" id="kpi-ggr">€8.42M</strong><span class="delta" id="delta-ggr">↑ 8.7% <small>vs prior</small></span></article>
+          <article class="kpi"><span class="kpi-label">Net gaming revenue <span class="info" title="GGR less bonuses and gaming tax">i</span></span><strong class="kpi-value" id="kpi-ngr">€6.11M</strong><span class="delta" id="delta-ngr">↑ 7.2% <small>vs prior</small></span></article>
+          <article class="kpi"><span class="kpi-label">Active players</span><strong class="kpi-value" id="kpi-players">42,860</strong><span class="delta" id="delta-players">↑ 5.4% <small>vs prior</small></span></article>
+          <article class="kpi"><span class="kpi-label">NGR / active</span><strong class="kpi-value" id="kpi-arpu">€142.56</strong><span class="delta" id="delta-arpu">↑ 1.7% <small>vs prior</small></span></article>
+          <article class="kpi"><span class="kpi-label">FTD conversion <span class="info" title="Registrations becoming first-time depositors">i</span></span><strong class="kpi-value" id="kpi-ftd">23.8%</strong><span class="delta" id="delta-ftd">↑ 1.9pp <small>vs prior</small></span></article>
+          <article class="kpi"><span class="kpi-label">D30 retention</span><strong class="kpi-value" id="kpi-retention">31.6%</strong><span class="delta down" id="delta-retention">↓ 0.8pp <small>vs prior</small></span></article>
+        </div>
+
+        <div class="chart-grid">
+          <article class="chart-card">
+            <div class="chart-head"><div><h3>Daily net gaming revenue</h3><p class="chart-sub" id="trend-subtitle">90-day trend · all markets</p></div><div class="chart-total">Period movement<b id="trend-movement">+12.4%</b></div></div>
+            <svg id="revenue-chart" viewBox="0 0 720 250" role="img" aria-labelledby="trend-title trend-desc">
+              <title id="trend-title">Net gaming revenue trend</title><desc id="trend-desc">Synthetic daily net gaming revenue for the selected reporting period and market.</desc>
+              <defs><linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00f5ff" stop-opacity=".30"/><stop offset="1" stop-color="#00f5ff" stop-opacity="0"/></linearGradient></defs>
+              <g id="chart-gridlines"></g><path class="area" id="trend-area"></path><path class="trend-line" id="trend-path"></path><g id="trend-points"></g><g id="chart-labels"></g>
+            </svg>
+          </article>
+          <article class="chart-card">
+            <div class="chart-head"><div><h3>GGR by product</h3><p class="chart-sub">Selected period contribution</p></div></div>
+            <div class="mix-wrap"><div class="donut" id="product-donut" role="img" aria-label="Product share: slots 44 percent, live casino 29 percent, sportsbook 17 percent, other 10 percent"></div><div class="donut-copy"><b id="mix-total">€8.42M</b>total GGR</div></div>
+            <div class="legend" id="product-legend"></div>
+          </article>
+        </div>
+
+        <div class="lower-grid">
+          <article class="chart-card">
+            <div class="chart-head"><div><h3>First-time depositors by channel</h3><p class="chart-sub">Volume and relative acquisition mix</p></div></div>
+            <div id="source-bars"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-head"><div><h3>Player wellbeing signals</h3><p class="chart-sub">Operational monitoring · not a clinical assessment</p></div><span class="pill synthetic">Illustrative</span></div>
+            <div class="rg-list">
+              <div class="rg-row"><span class="rg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></span><span><span class="rg-name">Deposit limits enabled</span><span class="rg-detail">Share of monthly active players</span></span><strong class="rg-metric" id="rg-limits">28.4%</strong></div>
+              <div class="rg-row"><span class="rg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span><span class="rg-name">Reality checks used</span><span class="rg-detail">Session reminder interaction rate</span></span><strong class="rg-metric" id="rg-checks">14.7%</strong></div>
+              <div class="rg-row"><span class="rg-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M4 20h16L12 4z"/></svg></span><span><span class="rg-name">Review queue</span><span class="rg-detail">Synthetic rule-based flags awaiting review</span></span><strong class="rg-metric amber" id="rg-reviews">126</strong></div>
+            </div>
+          </article>
+        </div>
+        <div class="synthetic-foot"><span>Generated sample dataset · refreshed for this demo on page load</span><span id="dashboard-status">90 days · All markets</span></div>
+      </div>
+    </section>
+
+    <section class="section shell reveal" aria-labelledby="cohort-title">
+      <div class="section-head"><div><div class="section-kicker">Retention analysis</div><h2 id="cohort-title">Monthly player cohorts</h2></div><p class="section-note">Each row follows a synthetic first-deposit cohort. Values show the share returning in each subsequent month.</p></div>
+      <div class="cohort-card glass">
+        <div class="cohort-scroll" role="region" aria-label="Scrollable cohort retention table" tabindex="0">
+          <table class="cohort-table">
+            <thead><tr><th scope="col">FTD cohort</th><th scope="col">Players</th><th scope="col">M0</th><th scope="col">M1</th><th scope="col">M2</th><th scope="col">M3</th><th scope="col">M4</th><th scope="col">M5</th></tr></thead>
+            <tbody>
+              <tr><td>Jan 2026</td><td>4,280</td><td class="heat-10">100%</td><td class="heat-8">46%</td><td class="heat-7">38%</td><td class="heat-6">33%</td><td class="heat-5">29%</td><td class="heat-5">27%</td></tr>
+              <tr><td>Feb 2026</td><td>4,610</td><td class="heat-10">100%</td><td class="heat-8">48%</td><td class="heat-7">39%</td><td class="heat-6">34%</td><td class="heat-5">30%</td><td class="heat-na">—</td></tr>
+              <tr><td>Mar 2026</td><td>4,940</td><td class="heat-10">100%</td><td class="heat-9">51%</td><td class="heat-8">42%</td><td class="heat-7">36%</td><td class="heat-na">—</td><td class="heat-na">—</td></tr>
+              <tr><td>Apr 2026</td><td>5,180</td><td class="heat-10">100%</td><td class="heat-9">53%</td><td class="heat-8">43%</td><td class="heat-na">—</td><td class="heat-na">—</td><td class="heat-na">—</td></tr>
+              <tr><td>May 2026</td><td>5,420</td><td class="heat-10">100%</td><td class="heat-9">55%</td><td class="heat-na">—</td><td class="heat-na">—</td><td class="heat-na">—</td><td class="heat-na">—</td></tr>
+              <tr><td>Jun 2026</td><td>5,760</td><td class="heat-10">100%</td><td class="heat-na">—</td><td class="heat-na">—</td><td class="heat-na">—</td><td class="heat-na">—</td><td class="heat-na">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cohort-legend"><span>Lower</span><i class="heat-key heat-4"></i><i class="heat-key heat-6"></i><i class="heat-key heat-8"></i><i class="heat-key heat-10"></i><span>Higher retention</span></div>
+      </div>
+    </section>
+
+    <section class="section shell reveal" aria-labelledby="insights-title">
+      <div class="section-head"><div><div class="section-kicker">From metrics to action</div><h2 id="insights-title">Illustrative stakeholder insights</h2></div><p class="section-note">Hypotheses are separated from observations so decisions are not presented as proven causality.</p></div>
+      <div class="story-grid">
+        <article class="story-card glass"><span class="story-number" aria-hidden="true">01</span><span class="story-label">Observation</span><h3>Casino growth leads the period</h3><p>Slots and live casino contribute 73% of synthetic GGR, while period NGR increases 7.2% against the previous comparable window.</p><div class="action"><b>Next step</b><span>Validate whether the lift is broad-based or concentrated in a small player group.</span></div></article>
+        <article class="story-card glass"><span class="story-number" aria-hidden="true">02</span><span class="story-label">Hypothesis</span><h3>Onboarding may be improving</h3><p>Later cohorts retain more strongly at M1. This could reflect campaign quality, product changes or seasonality; the dashboard alone cannot prove why.</p><div class="action"><b>Next step</b><span>Run a controlled cohort comparison by channel, market and welcome journey.</span></div></article>
+        <article class="story-card glass"><span class="story-number" aria-hidden="true">03</span><span class="story-label">Action</span><h3>Balance growth with wellbeing</h3><p>Commercial metrics are paired with limit adoption, reality-check use and review volume to keep safer-gambling monitoring visible.</p><div class="action"><b>Next step</b><span>Review alert service levels and segment exposure before scaling campaigns.</span></div></article>
+      </div>
+    </section>
+
+    <section class="section shell reveal" id="methodology" aria-labelledby="method-title">
+      <div class="method">
+        <article class="method-copy glass"><div class="section-kicker">Build approach</div><h2 id="method-title">From warehouse to decision</h2><p>The case study models a repeatable BI workflow: define event grain, validate player and transaction keys, aggregate reusable daily facts, then expose governed KPIs to an executive layer. Real implementations would add role-based access, privacy controls, lineage, alert ownership and tested refresh SLAs.</p><div class="tech-list"><span class="tech">SQL</span><span class="tech">Python QA</span><span class="tech">Tableau</span><span class="tech">Star schema</span><span class="tech">Data quality tests</span></div></article>
+        <div class="pipeline glass" aria-label="Analytics pipeline">
+          <div class="pipe-step"><span class="pipe-num">01</span><div><h3>Ingest and validate</h3><p>Check event completeness, currency mapping, duplicates, timestamps and player identifiers.</p></div></div>
+          <div class="pipe-step"><span class="pipe-num">02</span><div><h3>Model the analytical grain</h3><p>Build daily player-product facts linked to date, market, channel and product dimensions.</p></div></div>
+          <div class="pipe-step"><span class="pipe-num">03</span><div><h3>Define governed metrics</h3><p>Document GGR, NGR, FTD conversion and retention with aligned filters and ownership.</p></div></div>
+          <div class="pipe-step"><span class="pipe-num">04</span><div><h3>Deliver and monitor</h3><p>Publish the dashboard, test access, track refresh health and investigate material variance.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta shell glass reveal" aria-labelledby="cta-title">
+      <div class="cta-copy"><div class="section-kicker">Continue exploring</div><h2 id="cta-title">Want to discuss the analysis?</h2><p>I can walk through the KPI definitions, data model, dashboard decisions and how this synthetic concept could translate to a governed production workflow.</p></div>
+      <div class="cta-actions"><a class="button secondary" href="../../index.html#projects">View all projects</a><a class="button" href="../../index.html#links">Contact me</a></div>
+    </section>
+  </main>
+
+  <footer><div class="footer-row shell"><span>© 2026 Viktor Paunovic · Synthetic portfolio case study</span><a href="../../index.html#projects">Back to portfolio projects ↑</a></div></footer>
+  <div class="chart-tooltip" id="chart-tooltip" role="status"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const scenarios = {
+        all:{factor:1,label:'All markets',mix:[44,29,17,10],sources:[['Paid search',2840],['Affiliates',2360],['Organic',1710],['CRM / referral',1050]],rg:[28.4,14.7,126]},
+        uk:{factor:.36,label:'United Kingdom',mix:[41,31,20,8],sources:[['Paid search',1120],['Affiliates',910],['Organic',680],['CRM / referral',390]],rg:[30.8,16.2,49]},
+        de:{factor:.27,label:'Germany',mix:[47,27,15,11],sources:[['Paid search',780],['Affiliates',690],['Organic',470],['CRM / referral',310]],rg:[27.1,13.8,34]},
+        fi:{factor:.19,label:'Finland',mix:[49,26,16,9],sources:[['Paid search',520],['Affiliates',430],['Organic',350],['CRM / referral',210]],rg:[31.5,18.1,25]},
+        ca:{factor:.18,label:'Canada',mix:[38,34,18,10],sources:[['Paid search',480],['Affiliates',420],['Organic',310],['CRM / referral',220]],rg:[23.9,11.7,18]}
+      };
+      const ranges = {
+        30:{factor:.345,growth:5.8,retention:32.4,conversion:24.5},
+        90:{factor:1,growth:7.2,retention:31.6,conversion:23.8},
+        180:{factor:1.91,growth:10.1,retention:30.9,conversion:22.9}
+      };
+      const base = {ggr:8.42,ngr:6.11,players:42860};
+      const productNames=['Slots','Live casino','Sportsbook','Other'];
+      const productColors=['#00f5ff','#bf00ff','#00ff88','#f5a623'];
+      const fmtMoney = value => value >= 1 ? `€${value.toFixed(2)}M` : `€${Math.round(value*1000)}K`;
+      const fmtInt = value => Math.round(value).toLocaleString('en-GB');
+      let activeRange=90;
+      let activeMarket='all';
+
+      const seedNoise = (i, salt) => {
+        const x=Math.sin((i+1)*12.9898+salt*78.233)*43758.5453;
+        return (x-Math.floor(x))-.5;
+      };
+      function trendData(days, marketFactor){
+        const count=days===30?15:days===90?24:30;
+        const dailyBase=67900*marketFactor;
+        return Array.from({length:count},(_,i)=>{
+          const climb=.88+(i/(count-1))*.19;
+          const weekly=Math.sin(i*1.62)*.055;
+          const noise=seedNoise(i,days+marketFactor*10)*.085;
+          return Math.max(9000,dailyBase*(climb+weekly+noise));
+        });
+      }
+
+      function drawTrend(values){
+        const width=720,height=250,pad={l:44,r:15,t:15,b:29};
+        const min=Math.min(...values)*.88,max=Math.max(...values)*1.08;
+        const x=i=>pad.l+i*(width-pad.l-pad.r)/(values.length-1);
+        const y=v=>pad.t+(max-v)*(height-pad.t-pad.b)/(max-min);
+        const points=values.map((v,i)=>[x(i),y(v)]);
+        const line=points.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+        document.getElementById('trend-path').setAttribute('d',line);
+        document.getElementById('trend-area').setAttribute('d',`${line} L${points.at(-1)[0].toFixed(1)},${height-pad.b} L${points[0][0].toFixed(1)},${height-pad.b} Z`);
+        const grid=document.getElementById('chart-gridlines');
+        const labels=document.getElementById('chart-labels');
+        grid.textContent='';labels.textContent='';
+        for(let i=0;i<4;i++){
+          const gy=pad.t+i*(height-pad.t-pad.b)/3;
+          const lineEl=document.createElementNS('http://www.w3.org/2000/svg','line');
+          lineEl.setAttribute('x1',pad.l);lineEl.setAttribute('x2',width-pad.r);lineEl.setAttribute('y1',gy);lineEl.setAttribute('y2',gy);lineEl.setAttribute('class','grid-line');grid.appendChild(lineEl);
+          const val=max-i*(max-min)/3;
+          const text=document.createElementNS('http://www.w3.org/2000/svg','text');text.setAttribute('x',2);text.setAttribute('y',gy+3);text.setAttribute('class','axis-label');text.textContent=`€${Math.round(val/1000)}k`;labels.appendChild(text);
+        }
+        const periodLabels=activeRange===30?['Day 1','Day 10','Day 20','Day 30']:activeRange===90?['Month 1','Month 2','Month 3']:['Month 1','Month 3','Month 6'];
+        periodLabels.forEach((label,i)=>{const text=document.createElementNS('http://www.w3.org/2000/svg','text');text.setAttribute('x',pad.l+i*(width-pad.l-pad.r)/(periodLabels.length-1));text.setAttribute('y',height-7);text.setAttribute('text-anchor',i===0?'start':i===periodLabels.length-1?'end':'middle');text.setAttribute('class','axis-label');text.textContent=label;labels.appendChild(text)});
+        const dots=document.getElementById('trend-points');dots.textContent='';
+        points.forEach((p,i)=>{if(i%Math.max(1,Math.round(values.length/8))!==0&&i!==values.length-1)return;const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',p[0]);c.setAttribute('cy',p[1]);c.setAttribute('r',3);c.setAttribute('class','trend-point');c.dataset.value=Math.round(values[i]);c.dataset.index=i+1;c.setAttribute('tabindex','0');c.setAttribute('aria-label',`Point ${i+1}: €${Math.round(values[i]).toLocaleString('en-GB')}`);dots.appendChild(c)});
+        bindPoints();
+      }
+
+      function bindPoints(){
+        const tooltip=document.getElementById('chart-tooltip');
+        const show=(event,el)=>{tooltip.innerHTML=`Period point ${el.dataset.index}<b>€${Number(el.dataset.value).toLocaleString('en-GB')} NGR</b>`;tooltip.style.display='block';const box=el.getBoundingClientRect();tooltip.style.left=`${event.clientX||box.left+box.width/2}px`;tooltip.style.top=`${event.clientY||box.top}px`};
+        document.querySelectorAll('.trend-point').forEach(point=>{point.addEventListener('pointerenter',e=>show(e,point));point.addEventListener('pointermove',e=>show(e,point));point.addEventListener('pointerleave',()=>tooltip.style.display='none');point.addEventListener('focus',e=>show(e,point));point.addEventListener('blur',()=>tooltip.style.display='none')});
+      }
+
+      function updateDashboard(){
+        const market=scenarios[activeMarket],range=ranges[activeRange];
+        const factor=market.factor*range.factor;
+        const marketAdj=activeMarket==='all'?1:1+(Object.keys(scenarios).indexOf(activeMarket)-2)*.012;
+        const ggr=base.ggr*factor*marketAdj,ngr=base.ngr*factor*marketAdj,players=base.players*factor*(activeRange===180?.97:1);
+        const arpu=ngr*1000000/players;
+        const conversion=range.conversion+(activeMarket==='uk'?1.2:activeMarket==='de'?-1.1:activeMarket==='fi'?.6:activeMarket==='ca'?.3:0);
+        const retention=range.retention+(activeMarket==='fi'?2.2:activeMarket==='ca'?-1.4:activeMarket==='de'?.3:0);
+        document.getElementById('kpi-ggr').textContent=fmtMoney(ggr);
+        document.getElementById('kpi-ngr').textContent=fmtMoney(ngr);
+        document.getElementById('kpi-players').textContent=fmtInt(players);
+        document.getElementById('kpi-arpu').textContent=`€${arpu.toFixed(2)}`;
+        document.getElementById('kpi-ftd').textContent=`${conversion.toFixed(1)}%`;
+        document.getElementById('kpi-retention').textContent=`${retention.toFixed(1)}%`;
+        document.getElementById('delta-ggr').innerHTML=`↑ ${(range.growth+1.5).toFixed(1)}% <small>vs prior</small>`;
+        document.getElementById('delta-ngr').innerHTML=`↑ ${range.growth.toFixed(1)}% <small>vs prior</small>`;
+        document.getElementById('delta-players').innerHTML=`↑ ${(range.growth-.9).toFixed(1)}% <small>vs prior</small>`;
+        document.getElementById('delta-arpu').innerHTML=`↑ ${(range.growth/4.2).toFixed(1)}% <small>vs prior</small>`;
+        document.getElementById('mix-total').textContent=fmtMoney(ggr);
+        document.getElementById('trend-movement').textContent=`+${(range.growth+5.2).toFixed(1)}%`;
+        document.getElementById('trend-subtitle').textContent=`${activeRange}-day trend · ${market.label.toLowerCase()}`;
+        document.getElementById('dashboard-status').textContent=`${activeRange} days · ${market.label}`;
+        document.getElementById('rg-limits').textContent=`${market.rg[0].toFixed(1)}%`;
+        document.getElementById('rg-checks').textContent=`${market.rg[1].toFixed(1)}%`;
+        document.getElementById('rg-reviews').textContent=fmtInt(market.rg[2]*range.factor);
+        drawTrend(trendData(activeRange,market.factor));
+        renderMix(market.mix);
+        renderSources(market.sources.map(([name,value])=>[name,Math.round(value*range.factor)]));
+      }
+
+      function renderMix(mix){
+        let cursor=0;
+        const stops=mix.map((value,i)=>{const start=cursor;cursor+=value;return `${productColors[i]} ${start}% ${cursor}%`}).join(',');
+        const donut=document.getElementById('product-donut');donut.style.background=`conic-gradient(${stops})`;donut.setAttribute('aria-label',mix.map((v,i)=>`${productNames[i]} ${v} percent`).join(', '));
+        document.getElementById('product-legend').innerHTML=mix.map((v,i)=>`<div class="legend-item"><span class="legend-name"><i class="swatch" style="background:${productColors[i]}"></i>${productNames[i]}</span><b>${v}%</b></div>`).join('');
+      }
+      function renderSources(items){
+        const max=Math.max(...items.map(item=>item[1]));
+        document.getElementById('source-bars').innerHTML=items.map(([name,value])=>`<div class="source-row"><span>${name}</span><span class="source-track"><i class="source-fill" style="display:block;width:${value/max*100}%"></i></span><span class="source-value">${value.toLocaleString('en-GB')}</span></div>`).join('');
+      }
+
+      document.querySelectorAll('.range-btn').forEach(btn=>btn.addEventListener('click',()=>{
+        activeRange=Number(btn.dataset.range);
+        document.querySelectorAll('.range-btn').forEach(other=>{const active=other===btn;other.classList.toggle('active',active);other.setAttribute('aria-pressed',String(active))});
+        updateDashboard();
+      }));
+      document.getElementById('market-filter').addEventListener('change',event=>{activeMarket=event.target.value;updateDashboard()});
+
+      const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}}),{threshold:.08});
+      document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+      function initAmbient(){
+        const canvas=document.getElementById('ambient'),ctx=canvas.getContext('2d');
+        if(!ctx)return;
+        const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let width=0,height=0,raf=0,particles=[];
+        function resize(){const ratio=Math.min(devicePixelRatio||1,1.5);width=innerWidth;height=innerHeight;canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;ctx.setTransform(ratio,0,0,ratio,0,0);const count=Math.min(70,Math.max(24,Math.round(width/24)));particles=Array.from({length:count},(_,i)=>({x:(i*83%997)/997*width,y:(i*137%991)/991*height,r:i%7===0?1.4:.7,v:.06+(i%5)*.018,c:i%4===0?'191,0,255':'0,245,255'}))}
+        function frame(){ctx.clearRect(0,0,width,height);particles.forEach(p=>{p.y-=p.v;if(p.y<0){p.y=height;p.x=(p.x+137)%width}ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${p.c},${p.r>1?.22:.10})`;ctx.fill()});if(!document.hidden)raf=requestAnimationFrame(frame)}
+        resize();addEventListener('resize',resize,{passive:true});
+        if(reduced){frame();cancelAnimationFrame(raf)}else{frame();document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(raf);if(!document.hidden)frame()})}
+      }
+      updateDashboard();initAmbient();
+    })();
+  </script>
+</body>
+</html>

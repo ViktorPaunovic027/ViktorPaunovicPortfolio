@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="An interactive, illustrative revenue trend report case study built with synthetic data by Viktor Paunovic.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://viktorpaunovic.com/projects/revenue-trend-report/">
+  <meta property="og:title" content="Revenue Trend Report | Viktor Paunovic">
+  <meta property="og:description" content="An interactive revenue trend report case study built with clearly labelled synthetic data.">
+  <meta property="og:site_name" content="Viktor Paunovic Portfolio">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="color-scheme" content="dark">
+  <title>Revenue Trend Report | Viktor Paunovic</title>
+  <link rel="canonical" href="https://viktorpaunovic.com/projects/revenue-trend-report/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Cpath d='M12 45 25 33l9 6 18-22' fill='none' stroke='%2300ff88' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a0f;--bg-soft:#0d1117;--panel:rgba(255,255,255,.035);
+      --panel-strong:rgba(16,22,25,.92);--line:rgba(255,255,255,.085);
+      --text:#f0f0ff;--muted:rgba(240,240,255,.58);--dim:rgba(240,240,255,.38);
+      --green:#00ff88;--green-2:#00bd71;--cyan:#00f5ff;--purple:#bf00ff;
+      --amber:#f5a623;--red:#ff6b6b;--radius:18px;--shadow:0 22px 65px rgba(0,0,0,.3)
+    }
+    html{scroll-behavior:smooth;color-scheme:dark}
+    body{min-width:300px;background:var(--bg);color:var(--text);font-family:"Inter",sans-serif;line-height:1.6;overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 82% 5%,rgba(0,255,136,.09),transparent 33%),radial-gradient(circle at 12% 32%,rgba(0,245,255,.055),transparent 28%),linear-gradient(180deg,#090a0f 0%,#0a0a0f 52%,#090c0d 100%)}
+    body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.17;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(to bottom,black,transparent 72%)}
+    a{color:inherit}
+    button,select{font:inherit}
+    button{color:inherit}
+    :focus-visible{outline:2px solid var(--green);outline-offset:3px}
+    ::selection{background:rgba(0,255,136,.22);color:#fff}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(0,255,136,.35);border-radius:4px}
+    #particles{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.75}
+    .skip-link{position:fixed;z-index:1000;left:1rem;top:1rem;transform:translateY(-180%);background:var(--green);color:#05110b;padding:.65rem 1rem;border-radius:10px;text-decoration:none;font-weight:700;transition:transform .2s}
+    .skip-link:focus{transform:none}
+    .shell{width:min(1320px,calc(100% - 3rem));margin-inline:auto}
+    .topbar{position:sticky;top:0;z-index:50;border-bottom:1px solid transparent;background:linear-gradient(180deg,rgba(10,10,15,.94),rgba(10,10,15,.76));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:border-color .25s}
+    .topbar.scrolled{border-color:var(--line)}
+    .topbar-inner{min-height:74px;display:flex;align-items:center;justify-content:space-between;gap:1.25rem}
+    .brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:-.02em}
+    .brand-mark{width:32px;height:32px;display:grid;place-items:center;border:1px solid rgba(0,255,136,.35);border-radius:10px;color:var(--green);background:rgba(0,255,136,.07);box-shadow:0 0 26px rgba(0,255,136,.1)}
+    .brand-mark svg{width:18px;height:18px}
+    .nav-actions{display:flex;align-items:center;gap:.6rem}
+    .nav-link,.nav-cta{display:inline-flex;align-items:center;gap:.5rem;padding:.58rem .9rem;border-radius:999px;text-decoration:none;font-size:.8rem;font-weight:600;transition:background .25s,border-color .25s,transform .25s,color .25s}
+    .nav-link{color:var(--muted);border:1px solid transparent}.nav-link:hover{color:#fff;background:rgba(255,255,255,.045)}
+    .nav-cta{color:#07120d;background:var(--green);border:1px solid var(--green)}.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,255,136,.2)}
+    .hero{padding:clamp(4.5rem,9vw,8rem) 0 4.5rem;position:relative}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.6fr);align-items:end;gap:3rem}
+    .eyebrow{display:flex;align-items:center;gap:.65rem;margin-bottom:1.1rem;color:var(--green);font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+    .eyebrow::before{content:"";width:30px;height:1px;background:var(--green);box-shadow:0 0 10px var(--green)}
+    h1,h2,h3{font-family:"Space Grotesk",sans-serif}
+    h1{max-width:880px;font-size:clamp(3rem,7vw,6.5rem);line-height:.94;letter-spacing:-.055em}
+    h1 span{display:block;color:transparent;background:linear-gradient(105deg,var(--green),#baffd8 55%,var(--cyan));background-clip:text;-webkit-background-clip:text}
+    .hero-copy{max-width:710px;margin-top:1.6rem;color:var(--muted);font-size:clamp(.98rem,1.5vw,1.12rem)}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.75rem}
+    .tag{padding:.35rem .7rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.025);color:rgba(240,240,255,.72);font-size:.71rem;font-weight:600;letter-spacing:.035em}
+    .hero-aside{padding:1.4rem;border:1px solid rgba(0,255,136,.18);border-radius:var(--radius);background:linear-gradient(145deg,rgba(0,255,136,.075),rgba(255,255,255,.018));box-shadow:var(--shadow)}
+    .data-badge{display:inline-flex;align-items:center;gap:.5rem;color:var(--amber);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .data-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
+    .hero-aside p{margin-top:.8rem;color:var(--muted);font-size:.83rem}
+    .mini-stat{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;padding-top:1.1rem;border-top:1px solid var(--line)}
+    .mini-stat span{color:var(--dim);font-size:.72rem;text-transform:uppercase;letter-spacing:.09em}.mini-stat strong{font-family:"Space Grotesk";font-size:1.1rem;color:var(--green)}
+    .section{padding:5.5rem 0;position:relative}
+    .section + .section{border-top:1px solid var(--line)}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:2rem;margin-bottom:2rem}
+    .section-label{color:var(--green);font-size:.7rem;font-weight:700;letter-spacing:.17em;text-transform:uppercase;margin-bottom:.4rem}
+    h2{font-size:clamp(1.9rem,4vw,3rem);line-height:1.05;letter-spacing:-.035em}
+    .section-intro{max-width:560px;color:var(--muted);font-size:.9rem;text-align:right}
+    .report-shell{border:1px solid var(--line);border-radius:24px;background:rgba(8,12,14,.78);box-shadow:var(--shadow);overflow:hidden}
+    .report-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.15rem;border-bottom:1px solid var(--line);background:rgba(255,255,255,.018)}
+    .report-title{display:flex;align-items:center;gap:.7rem;font-family:"Space Grotesk";font-size:.88rem;font-weight:700}
+    .report-icon{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:#07120d;background:var(--green)}
+    .report-icon svg{width:15px;height:15px}
+    .periods{display:flex;flex-wrap:wrap;gap:.35rem}
+    .period-btn{border:1px solid transparent;background:transparent;border-radius:8px;padding:.45rem .7rem;color:var(--dim);font-size:.7rem;font-weight:700;cursor:pointer;transition:.2s}
+    .period-btn:hover{color:#fff;background:rgba(255,255,255,.04)}
+    .period-btn[aria-pressed="true"]{color:var(--green);background:rgba(0,255,136,.09);border-color:rgba(0,255,136,.22)}
+    .report-body{padding:1.15rem}
+    .notice{display:flex;align-items:flex-start;gap:.65rem;margin-bottom:1rem;padding:.72rem .9rem;border:1px solid rgba(245,166,35,.2);border-radius:12px;background:rgba(245,166,35,.055);color:rgba(255,225,177,.75);font-size:.72rem}
+    .notice svg{width:15px;height:15px;flex:none;margin-top:2px;color:var(--amber)}
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem}
+    .kpi{position:relative;min-height:142px;padding:1.05rem;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(255,255,255,.034),rgba(255,255,255,.012));overflow:hidden}
+    .kpi::after{content:"";position:absolute;left:1.05rem;right:55%;bottom:0;height:1px;background:var(--kpi-color,var(--green));box-shadow:0 0 12px var(--kpi-color,var(--green))}
+    .kpi-top{display:flex;justify-content:space-between;align-items:center;gap:.7rem}
+    .kpi-label{color:var(--dim);font-size:.68rem;font-weight:700;letter-spacing:.075em;text-transform:uppercase}
+    .kpi-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--kpi-color,var(--green)) 9%,transparent);color:var(--kpi-color,var(--green))}
+    .kpi-icon svg{width:15px;height:15px}
+    .kpi-value{margin-top:.6rem;font-family:"Space Grotesk";font-size:clamp(1.55rem,2.7vw,2.15rem);font-weight:700;letter-spacing:-.04em}
+    .kpi-detail{display:flex;align-items:center;gap:.45rem;margin-top:.25rem;color:var(--dim);font-size:.67rem}
+    .trend-pill{border-radius:999px;padding:.13rem .42rem;font-weight:700}.trend-pill.good{background:rgba(0,255,136,.09);color:var(--green)}.trend-pill.bad{background:rgba(255,107,107,.09);color:var(--red)}
+    .charts-grid{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(280px,.78fr);gap:.85rem;margin-top:.85rem}
+    .chart-card{position:relative;border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:1.1rem;min-width:0}
+    .chart-head{display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:.7rem}
+    .chart-title{font-size:.88rem;font-weight:700}.chart-sub{margin-top:.14rem;color:var(--dim);font-size:.67rem}
+    .legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.75rem;color:var(--dim);font-size:.65rem}
+    .legend span{display:flex;align-items:center;gap:.35rem}.legend i{width:8px;height:8px;border-radius:3px;display:block}
+    .chart-svg{display:block;width:100%;height:auto;overflow:visible}
+    .axis-text{fill:rgba(240,240,255,.34);font:10px Inter,sans-serif}
+    .chart-line{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1s ease forwards}
+    @keyframes draw{to{stroke-dashoffset:0}}
+    .tooltip{position:absolute;z-index:10;pointer-events:none;min-width:135px;padding:.65rem .75rem;border:1px solid rgba(0,255,136,.22);border-radius:10px;background:rgba(7,10,13,.96);box-shadow:0 12px 34px rgba(0,0,0,.5);opacity:0;transform:translate(-50%,-110%);transition:opacity .12s}
+    .tooltip.show{opacity:1}.tooltip strong{display:block;font-size:.7rem;margin-bottom:.3rem}.tooltip-row{display:flex;justify-content:space-between;gap:1.2rem;color:var(--muted);font-size:.65rem}.tooltip-row b{color:#fff}
+    .mix-list{display:grid;gap:1rem;margin-top:1.15rem}
+    .mix-row-head{display:flex;justify-content:space-between;gap:1rem;font-size:.72rem}.mix-row-head span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+    .mix-track{height:7px;margin-top:.42rem;border-radius:8px;background:rgba(255,255,255,.05);overflow:hidden}
+    .mix-fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--bar-color),color-mix(in srgb,var(--bar-color) 60%,white));transition:width .7s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 14px color-mix(in srgb,var(--bar-color) 32%,transparent)}
+    .bottom-grid{display:grid;grid-template-columns:1.18fr .82fr;gap:.85rem;margin-top:.85rem}
+    .market-table{width:100%;border-collapse:collapse;font-size:.72rem}
+    .market-table th{padding:.5rem .45rem;color:var(--dim);font-size:.6rem;text-transform:uppercase;letter-spacing:.09em;text-align:left;border-bottom:1px solid var(--line)}
+    .market-table th:not(:first-child),.market-table td:not(:first-child){text-align:right}
+    .market-table td{padding:.67rem .45rem;border-bottom:1px solid rgba(255,255,255,.045)}.market-table tbody tr:last-child td{border-bottom:0}
+    .market-name{display:flex;align-items:center;gap:.55rem;font-weight:600}.market-dot{width:7px;height:7px;border-radius:50%;background:var(--market-color);box-shadow:0 0 7px var(--market-color)}
+    .pos{color:var(--green)}.neg{color:var(--red)}
+    .insight-panel{background:linear-gradient(145deg,rgba(0,255,136,.055),rgba(0,245,255,.018))}
+    .insight-list{list-style:none;display:grid;gap:.75rem;margin-top:.9rem}
+    .insight-list li{display:grid;grid-template-columns:28px 1fr;gap:.7rem;align-items:start;padding-top:.75rem;border-top:1px solid var(--line);color:var(--muted);font-size:.74rem}
+    .insight-num{font-family:"Space Grotesk";color:var(--green);font-size:.7rem;font-weight:700}
+    .insight-list strong{display:block;color:#fff;font-size:.75rem;margin-bottom:.12rem}
+    .story-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .story-card{position:relative;padding:1.45rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
+    .story-card::before{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:linear-gradient(var(--green),transparent)}
+    .story-index{color:var(--green);font-size:.65rem;font-weight:700;letter-spacing:.13em}.story-card h3{margin-top:.8rem;font-size:1.05rem}.story-card p{margin-top:.55rem;color:var(--muted);font-size:.8rem}
+    .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+    .method-card{padding:1.55rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+    .method-card h3{font-size:1rem}.method-list{list-style:none;display:grid;gap:.7rem;margin-top:1rem}
+    .method-list li{display:flex;gap:.65rem;color:var(--muted);font-size:.78rem}.method-list li::before{content:"";width:6px;height:6px;margin-top:.47rem;flex:none;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(0,255,136,.6)}
+    .code-block{margin-top:1rem;padding:1rem;border:1px solid rgba(0,255,136,.13);border-radius:12px;background:#070b0c;overflow:auto;color:#b9d6c7;font:12px/1.7 Consolas,"Courier New",monospace;white-space:pre}
+    .code-block .fn{color:var(--cyan)}.code-block .var{color:#d8a6ff}.code-block .num{color:var(--amber)}
+    .cta{padding:5rem 0 6.5rem}.cta-box{display:flex;justify-content:space-between;align-items:center;gap:2rem;padding:clamp(1.5rem,4vw,3rem);border:1px solid rgba(0,255,136,.22);border-radius:24px;background:linear-gradient(120deg,rgba(0,255,136,.085),rgba(0,245,255,.035),rgba(191,0,255,.035));box-shadow:var(--shadow)}
+    .cta-box h2{font-size:clamp(1.7rem,3vw,2.5rem)}.cta-box p{max-width:650px;margin-top:.65rem;color:var(--muted);font-size:.88rem}
+    .cta-button{flex:none;display:inline-flex;align-items:center;gap:.55rem;padding:.8rem 1.15rem;border-radius:999px;background:var(--green);color:#06110c;text-decoration:none;font-size:.82rem;font-weight:800;transition:transform .25s,box-shadow .25s}.cta-button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,255,136,.22)}
+    footer{padding:1.7rem 0;border-top:1px solid var(--line);color:var(--dim);font-size:.72rem}.footer-inner{display:flex;justify-content:space-between;gap:1rem}.footer-inner a{text-decoration:none}.footer-inner a:hover{color:var(--green)}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}.reveal.visible{opacity:1;transform:none}
+    @media(max-width:980px){.hero-grid{grid-template-columns:1fr}.hero-aside{max-width:580px}.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid,.bottom-grid{grid-template-columns:1fr}.story-grid{grid-template-columns:1fr 1fr}.method-grid{grid-template-columns:1fr}.section-intro{text-align:left}.section-head{align-items:start;flex-direction:column;gap:.8rem}}
+    @media(max-width:680px){.shell{width:min(100% - 1.35rem,1320px)}.topbar-inner{min-height:64px}.brand span:last-child{display:none}.nav-link{padding:.5rem}.nav-link span{display:none}.hero{padding-top:3.5rem}.hero-grid{gap:2rem}.report-bar{align-items:flex-start;flex-direction:column}.report-body{padding:.7rem}.kpi-grid{grid-template-columns:1fr}.story-grid{grid-template-columns:1fr}.chart-card{padding:.85rem}.section{padding:4rem 0}.cta-box{align-items:flex-start;flex-direction:column}.footer-inner{flex-direction:column}.legend{justify-content:flex-start}.chart-head{flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}#particles{display:none}.reveal{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to report</a>
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <header class="topbar" id="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="../../index.html#projects" aria-label="Back to Viktor Paunovic portfolio projects">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></span>
+        <span>Viktor Paunovic</span>
+      </a>
+      <nav class="nav-actions" aria-label="Project navigation">
+        <a class="nav-link" href="../../index.html#projects"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4zM4 9h16M9 9v11"/></svg><span>All Projects</span></a>
+        <a class="nav-cta" href="../../index.html#links">Contact Me <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow">Finance analytics case study</div>
+          <h1>Revenue <span>Trend Report</span></h1>
+          <p class="hero-copy">A decision-focused Power BI concept that turns monthly revenue, budget and cost movement into a concise executive view—built to reveal momentum, variance and the markets driving change.</p>
+          <div class="hero-meta" aria-label="Project technologies">
+            <span class="tag">Power BI</span><span class="tag">DAX</span><span class="tag">SQL</span><span class="tag">Financial Analysis</span><span class="tag">Data Storytelling</span>
+          </div>
+        </div>
+        <aside class="hero-aside" aria-label="Data disclosure">
+          <span class="data-badge">Illustrative dataset</span>
+          <p>Every value on this page is synthetic and was created solely to demonstrate reporting, modelling and visual analysis skills. It does not represent a real company.</p>
+          <div class="mini-stat"><span>Reporting period</span><strong>FY 2025</strong></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="report-heading">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div><div class="section-label">Interactive report</div><h2 id="report-heading">Executive revenue overview</h2></div>
+          <p class="section-intro">Use the period controls to recalculate the full report. KPIs, trend lines, product mix and regional performance remain tied to one filter context.</p>
+        </div>
+
+        <div class="report-shell reveal">
+          <div class="report-bar">
+            <div class="report-title"><span class="report-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3"/></svg></span>Finance Performance / FY 2025</div>
+            <div class="periods" role="group" aria-label="Select reporting period">
+              <button class="period-btn" type="button" data-period="FY" aria-pressed="true">FY 2025</button>
+              <button class="period-btn" type="button" data-period="H1" aria-pressed="false">H1</button>
+              <button class="period-btn" type="button" data-period="H2" aria-pressed="false">H2</button>
+              <button class="period-btn" type="button" data-period="Q1" aria-pressed="false">Q1</button>
+              <button class="period-btn" type="button" data-period="Q2" aria-pressed="false">Q2</button>
+              <button class="period-btn" type="button" data-period="Q3" aria-pressed="false">Q3</button>
+              <button class="period-btn" type="button" data-period="Q4" aria-pressed="false">Q4</button>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/></svg><span><strong>Synthetic data:</strong> the financial values and business observations below are illustrative portfolio content, not audited results.</span></div>
+
+            <div class="kpi-grid" aria-live="polite" aria-atomic="true">
+              <article class="kpi" style="--kpi-color:var(--green)"><div class="kpi-top"><span class="kpi-label">Net revenue</span><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div><div class="kpi-value" id="revenue-kpi">€0</div><div class="kpi-detail"><span class="trend-pill good" id="growth-pill">0%</span><span>vs comparable prior period</span></div></article>
+              <article class="kpi" style="--kpi-color:var(--cyan)"><div class="kpi-top"><span class="kpi-label">Contribution profit</span><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 17 6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg></span></div><div class="kpi-value" id="profit-kpi">€0</div><div class="kpi-detail"><span class="trend-pill good" id="margin-pill">0%</span><span>contribution margin</span></div></article>
+              <article class="kpi" style="--kpi-color:var(--amber)"><div class="kpi-top"><span class="kpi-label">Budget variance</span><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8m-4-4v8"/></svg></span></div><div class="kpi-value" id="variance-kpi">€0</div><div class="kpi-detail"><span class="trend-pill good" id="variance-pill">0%</span><span>against revenue plan</span></div></article>
+              <article class="kpi" style="--kpi-color:var(--purple)"><div class="kpi-top"><span class="kpi-label">Best month</span><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v2a4 4 0 0 0 4 4m9-6h3v2a4 4 0 0 1-4 4"/></svg></span></div><div class="kpi-value" id="best-kpi">—</div><div class="kpi-detail"><span class="trend-pill good" id="best-pill">€0</span><span>highest net revenue</span></div></article>
+            </div>
+
+            <div class="charts-grid">
+              <article class="chart-card" id="trend-card">
+                <div class="chart-head"><div><div class="chart-title">Revenue vs budget</div><div class="chart-sub" id="trend-summary">Monthly net revenue and plan</div></div><div class="legend" aria-hidden="true"><span><i style="background:var(--green)"></i>Revenue</span><span><i style="background:var(--amber)"></i>Budget</span></div></div>
+                <svg class="chart-svg" id="trend-chart" viewBox="0 0 760 300" role="img" aria-label="Line chart comparing synthetic monthly revenue and budget"></svg>
+                <div class="tooltip" id="chart-tooltip" role="status"></div>
+              </article>
+              <article class="chart-card">
+                <div class="chart-head"><div><div class="chart-title">Revenue mix</div><div class="chart-sub">Share by product vertical</div></div></div>
+                <div class="mix-list" id="mix-list"></div>
+              </article>
+            </div>
+
+            <div class="bottom-grid">
+              <article class="chart-card">
+                <div class="chart-head"><div><div class="chart-title">Market contribution</div><div class="chart-sub">Revenue allocation and year-on-year movement</div></div></div>
+                <div style="overflow-x:auto"><table class="market-table"><thead><tr><th scope="col">Market</th><th scope="col">Revenue</th><th scope="col">Share</th><th scope="col">YoY</th></tr></thead><tbody id="market-body"></tbody></table></div>
+              </article>
+              <aside class="chart-card insight-panel">
+                <div class="chart-head"><div><div class="chart-title">Automated commentary</div><div class="chart-sub" id="insight-period">FY 2025 signal summary</div></div></div>
+                <ol class="insight-list" id="insight-list"></ol>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="story-heading">
+      <div class="shell">
+        <div class="section-head reveal"><div><div class="section-label">Business interpretation</div><h2 id="story-heading">From movement to action</h2></div><p class="section-intro">The report is designed around the questions finance leaders ask first: what changed, where it changed and which response deserves priority.</p></div>
+        <div class="story-grid">
+          <article class="story-card reveal"><span class="story-index">01 / OBSERVE</span><h3>Momentum strengthened</h3><p>Illustrative revenue finishes above plan as the second half outperforms the first, with Q4 providing the strongest quarterly contribution.</p></article>
+          <article class="story-card reveal"><span class="story-index">02 / EXPLAIN</span><h3>Mix supports margin</h3><p>Higher-value Casino and Live Casino activity expands the contribution base while Sportsbook remains the largest single product vertical.</p></article>
+          <article class="story-card reveal"><span class="story-index">03 / ACT</span><h3>Protect efficient growth</h3><p>Prioritise retention in high-growth markets and review acquisition efficiency before increasing spend in slower regional segments.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="method-heading">
+      <div class="shell">
+        <div class="section-head reveal"><div><div class="section-label">Build approach</div><h2 id="method-heading">Model and methodology</h2></div><p class="section-intro">A compact star schema and explicit measures keep finance logic auditable, reusable and responsive to report filters.</p></div>
+        <div class="method-grid">
+          <article class="method-card reveal"><h3>Semantic model</h3><ul class="method-list"><li><span><strong>FactRevenue</strong> at month × market × product grain, containing revenue, variable cost and budget amounts.</span></li><li><span><strong>DimDate, DimMarket and DimProduct</strong> filter the fact table through one-to-many, single-direction relationships.</span></li><li><span>Power Query standardises source types and keys; DAX handles filter-sensitive financial measures.</span></li><li><span>Variance uses budget as its denominator and returns blank when a valid comparison is unavailable.</span></li></ul></article>
+          <article class="method-card reveal"><h3>Representative DAX</h3><div class="code-block" aria-label="DAX measure example"><span class="var">Revenue Variance %</span> =
+<span class="fn">VAR</span> ActualRevenue = [Net Revenue]
+<span class="fn">VAR</span> BudgetRevenue = [Revenue Budget]
+<span class="fn">RETURN</span>
+    <span class="fn">DIVIDE</span> (
+        ActualRevenue - BudgetRevenue,
+        BudgetRevenue
+    )</div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="shell"><div class="cta-box reveal"><div><div class="section-label">Have a reporting challenge?</div><h2>Let’s turn the numbers into a decision.</h2><p>I build clear analytical experiences that connect reliable models, useful measures and executive-ready data storytelling.</p></div><a class="cta-button" href="../../index.html#links">Contact Me <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></div>
+    </section>
+  </main>
+
+  <footer><div class="shell footer-inner"><span>© 2026 Viktor Paunovic · Revenue Trend Report</span><span>Illustrative case study · <a href="../../index.html#projects">Back to projects</a></span></div></footer>
+
+  <script>
+    "use strict";
+
+    const MONTHS = [
+      {m:"Jan",r:620,b:605,p:574,c:438,cat:[.39,.33,.18,.10],market:[.29,.25,.19,.15,.12]},
+      {m:"Feb",r:648,b:625,p:598,c:452,cat:[.38,.34,.18,.10],market:[.29,.25,.20,.14,.12]},
+      {m:"Mar",r:671,b:650,p:616,c:466,cat:[.38,.34,.19,.09],market:[.30,.24,.20,.14,.12]},
+      {m:"Apr",r:655,b:670,p:638,c:461,cat:[.37,.35,.19,.09],market:[.30,.24,.20,.14,.12]},
+      {m:"May",r:702,b:690,p:659,c:485,cat:[.37,.35,.19,.09],market:[.30,.24,.21,.13,.12]},
+      {m:"Jun",r:731,b:710,p:674,c:501,cat:[.36,.36,.19,.09],market:[.31,.24,.20,.13,.12]},
+      {m:"Jul",r:768,b:735,p:701,c:522,cat:[.36,.36,.20,.08],market:[.31,.24,.20,.13,.12]},
+      {m:"Aug",r:751,b:755,p:715,c:519,cat:[.35,.37,.20,.08],market:[.31,.23,.21,.13,.12]},
+      {m:"Sep",r:795,b:770,p:729,c:541,cat:[.35,.37,.20,.08],market:[.32,.23,.21,.12,.12]},
+      {m:"Oct",r:836,b:800,p:758,c:564,cat:[.34,.38,.20,.08],market:[.32,.23,.21,.12,.12]},
+      {m:"Nov",r:874,b:825,p:784,c:586,cat:[.34,.38,.20,.08],market:[.32,.23,.21,.12,.12]},
+      {m:"Dec",r:918,b:850,p:821,c:611,cat:[.33,.39,.20,.08],market:[.33,.22,.21,.12,.12]}
+    ];
+    const PERIODS = {FY:[0,12,"FY 2025"],H1:[0,6,"H1 2025"],H2:[6,12,"H2 2025"],Q1:[0,3,"Q1 2025"],Q2:[3,6,"Q2 2025"],Q3:[6,9,"Q3 2025"],Q4:[9,12,"Q4 2025"]};
+    const CATEGORIES = ["Sportsbook","Casino","Live Casino","Poker"];
+    const CAT_COLORS = ["#00ff88","#00f5ff","#bf00ff","#f5a623"];
+    const MARKETS = ["United Kingdom","Germany","Sweden","Malta","Other"];
+    const MARKET_COLORS = ["#00ff88","#00f5ff","#bf00ff","#f5a623","#7b8794"];
+    const MARKET_YOY = [12.8,8.4,14.1,5.7,-1.9];
+    const money = value => value >= 1000 ? `€${(value/1000).toFixed(2)}M` : `€${Math.round(value)}K`;
+    const pct = value => `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
+    const sum = (rows,key) => rows.reduce((total,row) => total + row[key],0);
+
+    let currentPeriod = "FY";
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => [...document.querySelectorAll(selector)];
+
+    function setPill(element,value,goodWhenPositive=true){
+      const good = goodWhenPositive ? value >= 0 : value <= 0;
+      element.className = `trend-pill ${good ? "good" : "bad"}`;
+      element.textContent = pct(value);
+    }
+
+    function renderReport(periodKey){
+      currentPeriod = periodKey;
+      const [start,end,label] = PERIODS[periodKey];
+      const rows = MONTHS.slice(start,end);
+      const revenue = sum(rows,"r");
+      const budget = sum(rows,"b");
+      const prior = sum(rows,"p");
+      const cost = sum(rows,"c");
+      const profit = revenue - cost;
+      const growth = (revenue/prior-1)*100;
+      const margin = profit/revenue*100;
+      const varianceValue = revenue-budget;
+      const variance = varianceValue/budget*100;
+      const best = rows.reduce((leader,row) => row.r > leader.r ? row : leader,rows[0]);
+
+      $("#revenue-kpi").textContent = money(revenue);
+      $("#profit-kpi").textContent = money(profit);
+      $("#variance-kpi").textContent = `${varianceValue >= 0 ? "+" : "−"}${money(Math.abs(varianceValue))}`;
+      $("#best-kpi").textContent = best.m;
+      $("#best-pill").textContent = money(best.r);
+      setPill($("#growth-pill"),growth);
+      $("#margin-pill").textContent = `${margin.toFixed(1)}%`;
+      setPill($("#variance-pill"),variance);
+      $("#insight-period").textContent = `${label} signal summary`;
+
+      renderTrend(rows,label);
+      renderMix(rows,revenue);
+      renderMarkets(rows,revenue);
+      renderInsights({rows,label,revenue,budget,growth,margin,variance,best});
+    }
+
+    function renderTrend(rows,label){
+      const svg = $("#trend-chart");
+      const W=760,H=300,L=58,R=20,T=22,B=40;
+      const values = rows.flatMap(row => [row.r,row.b]);
+      const rawMin = Math.min(...values), rawMax = Math.max(...values);
+      const pad = Math.max(40,(rawMax-rawMin)*.18);
+      const min = Math.floor((rawMin-pad)/50)*50;
+      const max = Math.ceil((rawMax+pad)/50)*50;
+      const cw=W-L-R,ch=H-T-B;
+      const x = index => rows.length === 1 ? L+cw/2 : L+(index/(rows.length-1))*cw;
+      const y = value => T+ch-((value-min)/(max-min))*ch;
+      const path = key => rows.map((row,index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(row[key]).toFixed(1)}`).join(" ");
+      const revenuePath = path("r"), budgetPath = path("b");
+      const area = `${revenuePath} L${x(rows.length-1).toFixed(1)},${T+ch} L${x(0).toFixed(1)},${T+ch} Z`;
+      const ticks = Array.from({length:5},(_,index) => min + ((max-min)/4)*index).reverse();
+      svg.innerHTML = `
+        <defs><linearGradient id="revenueArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00ff88" stop-opacity=".2"/><stop offset="1" stop-color="#00ff88" stop-opacity="0"/></linearGradient></defs>
+        ${ticks.map((tick,index) => {const ty=T+(index/4)*ch;return `<line x1="${L}" y1="${ty}" x2="${W-R}" y2="${ty}" stroke="rgba(255,255,255,.055)"/><text x="${L-9}" y="${ty+4}" text-anchor="end" class="axis-text">€${Math.round(tick)}K</text>`}).join("")}
+        <path d="${area}" fill="url(#revenueArea)"/>
+        <path d="${budgetPath}" class="chart-line" stroke="#f5a623" stroke-width="2" stroke-dasharray="6 7"/>
+        <path d="${revenuePath}" class="chart-line" stroke="#00ff88" stroke-width="3"/>
+        ${rows.map((row,index) => `<g class="chart-point" data-index="${index}" tabindex="0" role="img" aria-label="${row.m}: revenue ${money(row.r)}, budget ${money(row.b)}"><circle cx="${x(index)}" cy="${y(row.r)}" r="10" fill="transparent"/><circle cx="${x(index)}" cy="${y(row.r)}" r="3.5" fill="#00ff88" stroke="#08100c" stroke-width="2"/><text x="${x(index)}" y="${H-12}" text-anchor="middle" class="axis-text">${row.m}</text></g>`).join("")}
+      `;
+      svg.setAttribute("aria-label",`${label}: line chart comparing synthetic revenue and budget. Revenue ranges from ${money(Math.min(...rows.map(r=>r.r)))} to ${money(Math.max(...rows.map(r=>r.r)))}.`);
+      $("#trend-summary").textContent = `${label} monthly net revenue and plan`;
+      bindTrendInteractions(rows);
+    }
+
+    function bindTrendInteractions(rows){
+      const card = $("#trend-card"),svg=$("#trend-chart"),tip=$("#chart-tooltip");
+      const show = (index,clientX,clientY) => {
+        const row=rows[index],rect=card.getBoundingClientRect();
+        tip.innerHTML=`<strong>${row.m} 2025</strong><div class="tooltip-row"><span>Revenue</span><b>${money(row.r)}</b></div><div class="tooltip-row"><span>Budget</span><b>${money(row.b)}</b></div><div class="tooltip-row"><span>Variance</span><b class="${row.r>=row.b?"pos":"neg"}">${pct((row.r/row.b-1)*100)}</b></div>`;
+        const left=Math.max(80,Math.min(rect.width-80,clientX-rect.left));
+        const top=Math.max(95,clientY-rect.top);
+        tip.style.left=`${left}px`;tip.style.top=`${top}px`;tip.classList.add("show");
+      };
+      svg.querySelectorAll(".chart-point").forEach(point => {
+        point.addEventListener("pointerenter",event => show(Number(point.dataset.index),event.clientX,event.clientY));
+        point.addEventListener("pointermove",event => show(Number(point.dataset.index),event.clientX,event.clientY));
+        point.addEventListener("focus",() => {const rect=point.getBoundingClientRect();show(Number(point.dataset.index),rect.left+rect.width/2,rect.top)});
+        point.addEventListener("pointerleave",() => tip.classList.remove("show"));
+        point.addEventListener("blur",() => tip.classList.remove("show"));
+      });
+    }
+
+    function renderMix(rows,totalRevenue){
+      const values=CATEGORIES.map((_,catIndex) => rows.reduce((total,row) => total+row.r*row.cat[catIndex],0));
+      $("#mix-list").innerHTML=values.map((value,index) => {
+        const share=value/totalRevenue*100;
+        return `<div><div class="mix-row-head"><span>${CATEGORIES[index]}</span><span>${money(value)} · ${share.toFixed(1)}%</span></div><div class="mix-track"><div class="mix-fill" style="--bar-color:${CAT_COLORS[index]}" data-width="${share}"></div></div></div>`;
+      }).join("");
+      requestAnimationFrame(() => $$(".mix-fill").forEach(bar => bar.style.width=`${bar.dataset.width}%`));
+    }
+
+    function renderMarkets(rows,totalRevenue){
+      const values=MARKETS.map((_,marketIndex) => rows.reduce((total,row) => total+row.r*row.market[marketIndex],0));
+      $("#market-body").innerHTML=values.map((value,index) => `<tr><td><span class="market-name"><i class="market-dot" style="--market-color:${MARKET_COLORS[index]}"></i>${MARKETS[index]}</span></td><td>${money(value)}</td><td>${(value/totalRevenue*100).toFixed(1)}%</td><td class="${MARKET_YOY[index]>=0?"pos":"neg"}">${pct(MARKET_YOY[index])}</td></tr>`).join("");
+    }
+
+    function renderInsights(metrics){
+      const totalMonths=metrics.rows.length;
+      const aboveBudget=metrics.rows.filter(row => row.r>=row.b).length;
+      const last=metrics.rows[metrics.rows.length-1];
+      const first=metrics.rows[0];
+      const momentum=(last.r/first.r-1)*100;
+      const varianceText=metrics.variance>=0?"ahead of":"behind";
+      const items=[
+        ["Budget position",`${metrics.label} closed ${Math.abs(metrics.variance).toFixed(1)}% ${varianceText} plan, with ${aboveBudget} of ${totalMonths} months meeting or exceeding budget.`],
+        ["Period momentum",`Revenue moved ${pct(momentum)} from ${first.m} to ${last.m}; ${metrics.best.m} was the strongest month at ${money(metrics.best.r)}.`],
+        ["Margin signal",`Synthetic contribution margin reached ${metrics.margin.toFixed(1)}%, leaving ${money(metrics.revenue-sum(metrics.rows,"c"))} after modelled variable costs.`]
+      ];
+      $("#insight-list").innerHTML=items.map((item,index) => `<li><span class="insight-num">0${index+1}</span><span><strong>${item[0]}</strong>${item[1]}</span></li>`).join("");
+    }
+
+    $$(".period-btn").forEach(button => button.addEventListener("click",() => {
+      $$(".period-btn").forEach(item => item.setAttribute("aria-pressed",String(item===button)));
+      renderReport(button.dataset.period);
+    }));
+
+    const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if(entry.isIntersecting){entry.target.classList.add("visible");revealObserver.unobserve(entry.target)}
+    }),{threshold:.12});
+    $$(".reveal").forEach(element => revealObserver.observe(element));
+
+    const topbar=$("#topbar");
+    addEventListener("scroll",() => topbar.classList.toggle("scrolled",scrollY>12),{passive:true});
+
+    (function particles(){
+      if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+      const canvas=$("#particles"),ctx=canvas.getContext("2d");
+      let width=0,height=0,dots=[];
+      function resize(){
+        const dpr=Math.min(devicePixelRatio||1,1.5);width=innerWidth;height=innerHeight;
+        canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;ctx.setTransform(dpr,0,0,dpr,0,0);
+        const count=width<700?22:42;dots=Array.from({length:count},()=>({x:Math.random()*width,y:Math.random()*height,vx:(Math.random()-.5)*.13,vy:(Math.random()-.5)*.13,r:Math.random()*1.2+.35}));
+      }
+      function frame(){
+        ctx.clearRect(0,0,width,height);
+        dots.forEach(dot=>{dot.x=(dot.x+dot.vx+width)%width;dot.y=(dot.y+dot.vy+height)%height;ctx.beginPath();ctx.arc(dot.x,dot.y,dot.r,0,Math.PI*2);ctx.fillStyle="rgba(0,255,136,.18)";ctx.fill()});
+        for(let i=0;i<dots.length;i++)for(let j=i+1;j<dots.length;j++){const dx=dots[i].x-dots[j].x,dy=dots[i].y-dots[j].y,distanceSquared=dx*dx+dy*dy;if(distanceSquared<10000){ctx.beginPath();ctx.moveTo(dots[i].x,dots[i].y);ctx.lineTo(dots[j].x,dots[j].y);ctx.strokeStyle=`rgba(0,245,255,${.045*(1-Math.sqrt(distanceSquared)/100)})`;ctx.lineWidth=.5;ctx.stroke()}}
+        requestAnimationFrame(frame);
+      }
+      resize();addEventListener("resize",resize,{passive:true});frame();
+    })();
+
+    renderReport(currentPeriod);
+  </script>
+</body>
+</html>

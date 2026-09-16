@@ -1,6 +1,9 @@
 # Allow all search engines to index everything
 User-agent: *
 Allow: /
+Allow: /projects/igaming-kpi-dashboard/
+Allow: /projects/player-segmentation-model/
+Allow: /projects/revenue-trend-report/
 
 # Block AI scrapers (optional — comment out if you want them to learn from your site)
 User-agent: GPTBot
