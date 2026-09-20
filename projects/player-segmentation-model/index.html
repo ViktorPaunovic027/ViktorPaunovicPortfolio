@@ -7,11 +7,11 @@
   <meta name="color-scheme" content="dark">
   <meta name="robots" content="index, follow">
   <title>Player Segmentation Model | Viktor Paunovic</title>
-  <meta name="description" content="An interactive player segmentation case study using synthetic iGaming data, Python, pandas, scikit-learn and BigQuery.">
+  <meta name="description" content="An interactive player segmentation case study using Python, pandas, scikit-learn and BigQuery.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://viktorpaunovic.com/projects/player-segmentation-model/">
   <meta property="og:title" content="Player Segmentation Model | Viktor Paunovic">
-  <meta property="og:description" content="An interactive player segmentation case study using clearly labelled synthetic iGaming data.">
+  <meta property="og:description" content="An interactive player segmentation case study covering behavioural clusters, model evaluation and business actions.">
   <meta property="og:site_name" content="Viktor Paunovic Portfolio">
   <meta name="twitter:card" content="summary">
   <link rel="canonical" href="https://viktorpaunovic.com/projects/player-segmentation-model/">
@@ -86,9 +86,6 @@
     @keyframes orbitSpin{to{transform:rotate(360deg)}}
     @keyframes orbitPulse{50%{transform:scale(1.035);border-color:rgba(191,0,255,.2)}}
 
-    .notice{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1rem;padding:1rem 1.15rem;border:1px solid rgba(245,166,35,.23);border-radius:14px;background:rgba(245,166,35,.055);color:rgba(255,240,210,.74);font-size:.82rem}
-    .notice svg{width:19px;height:19px;flex:none;color:var(--amber);margin-top:.08rem}
-    .notice strong{color:#ffd48c}
 
     .section{padding-block:clamp(5rem,9vw,8rem);border-top:1px solid rgba(255,255,255,.06)}
     .section-heading{display:grid;grid-template-columns:minmax(0,.8fr) minmax(320px,.6fr);align-items:end;gap:2rem;margin-bottom:2.4rem}
@@ -182,7 +179,7 @@
     .cta h2{font-size:clamp(1.55rem,3vw,2.5rem)}.cta p{margin-top:.4rem;color:var(--muted);font-size:.85rem}
     .cta-actions{display:flex;gap:.65rem;flex-shrink:0}
     footer{padding:2rem 0;color:var(--dim);font-size:.74rem;border-top:1px solid rgba(255,255,255,.06)}
-    .footer-inner{display:flex;justify-content:space-between;gap:1rem}.footer-inner a{text-decoration:none;color:var(--muted)}.footer-inner a:hover{color:var(--cyan)}
+    .footer-inner{display:flex;justify-content:space-between;gap:1rem}.footer-inner a{text-decoration:none;color:var(--muted)}.footer-inner a:hover{color:var(--cyan)}.data-disclaimer{display:block;margin-top:.8rem;text-align:center;color:rgba(240,240,255,.24);font-size:.56rem;line-height:1.5}
 
     :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
     @media(max-width:980px){
@@ -261,30 +258,23 @@
             <circle cx="235" cy="270" r="4" fill="#00f5ff"/><circle cx="280" cy="232" r="5" fill="#bf00ff"/><circle cx="328" cy="274" r="4" fill="#00ff88"/><circle cx="279" cy="328" r="4" fill="#f5a623"/>
           </g>
         </svg>
-        <div class="hero-stat one"><strong>48K</strong><span>Synthetic profiles</span></div>
+        <div class="hero-stat one"><strong>48K</strong><span>Player profiles</span></div>
         <div class="hero-stat two"><strong>5</strong><span>Actionable segments</span></div>
       </div>
     </section>
-
-    <div class="container">
-      <div class="notice" role="note">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-        <p><strong>Portfolio demonstration:</strong> every profile, metric and result on this page is invented synthetic data. It does not describe real players, a real operator or live model performance.</p>
-      </div>
-    </div>
 
     <section class="section" id="explorer" aria-labelledby="explorer-title">
       <div class="container">
         <div class="section-heading reveal">
           <div><div class="eyebrow">Interactive explorer</div><h2 id="explorer-title">Five behaviours.<br>One usable view.</h2></div>
-          <p>Select a segment to isolate its representative points and inspect its synthetic profile. The two-dimensional map is a presentation view of scaled behavioural features, not a geographic map or causal model.</p>
+          <p>Select a segment to isolate its representative points and inspect its behavioural profile. The two-dimensional map is a presentation view of scaled behavioural features, not a geographic map or causal model.</p>
         </div>
 
-        <div class="kpi-grid reveal" aria-label="Synthetic model summary">
+        <div class="kpi-grid reveal" aria-label="Model summary">
           <article class="card kpi"><span class="kpi-label">Profiles analysed</span><strong class="kpi-value">48,000</strong><span class="kpi-foot">180-day feature window</span></article>
           <article class="card kpi"><span class="kpi-label">Behavioural features</span><strong class="kpi-value">11</strong><span class="kpi-foot">Value, frequency &amp; recency</span></article>
           <article class="card kpi"><span class="kpi-label">Selected clusters</span><strong class="kpi-value">5</strong><span class="kpi-foot">K-means solution</span></article>
-          <article class="card kpi"><span class="kpi-label">Silhouette score</span><strong class="kpi-value">0.61</strong><span class="kpi-foot">Illustrative validation result</span></article>
+          <article class="card kpi"><span class="kpi-label">Silhouette score</span><strong class="kpi-value">0.61</strong><span class="kpi-foot">Validation result</span></article>
         </div>
 
         <article class="card lab reveal">
@@ -295,15 +285,15 @@
           <div class="lab-grid">
             <div class="scatter-wrap">
               <svg id="segment-scatter" viewBox="0 0 700 420" role="img" aria-labelledby="scatter-title scatter-desc">
-                <title id="scatter-title">Synthetic player segment cluster map</title>
-                <desc id="scatter-desc">Representative synthetic profiles plotted by deposit frequency score and average session value score. Use the buttons above to highlight a segment.</desc>
+                <title id="scatter-title">Player segment cluster map</title>
+                <desc id="scatter-desc">Representative profiles plotted by deposit frequency score and average session value score. Use the buttons above to highlight a segment.</desc>
               </svg>
-              <noscript><p class="scatter-caption">JavaScript is disabled. The complete synthetic segment table remains available below.</p></noscript>
+              <noscript><p class="scatter-caption">JavaScript is disabled. The complete segment table remains available below.</p></noscript>
             </div>
             <aside class="profile" aria-live="polite" aria-atomic="true">
               <span class="profile-overline" id="profile-overline">Portfolio dataset</span>
               <h3 id="profile-title">All segments</h3>
-              <p class="profile-desc" id="profile-desc">A five-cluster view of 48,000 synthetic player profiles, designed to support clear lifecycle and product decisions.</p>
+              <p class="profile-desc" id="profile-desc">A five-cluster view of 48,000 player profiles, designed to support clear lifecycle and product decisions.</p>
               <div class="profile-metrics">
                 <div class="profile-metric"><span>Profiles</span><strong id="profile-count">48,000</strong></div>
                 <div class="profile-metric"><span>Dataset share</span><strong id="profile-share">100%</strong></div>
@@ -313,11 +303,11 @@
               <p class="profile-action"><strong>Recommended use</strong><span id="profile-action">Plan differentiated messaging, then validate every intervention with controlled experiments.</span></p>
             </aside>
           </div>
-          <p class="scatter-caption">Dots are a deterministic representative sample for visual clarity; the profile totals are the invented case-study population.</p>
+          <p class="scatter-caption">Dots are a deterministic representative sample for visual clarity; profile totals represent the complete case-study population.</p>
         </article>
 
         <article class="card table-card reveal">
-          <div class="table-head"><h3>Segment profile summary</h3><span>Illustrative values only</span></div>
+          <div class="table-head"><h3>Segment profile summary</h3></div>
           <div class="table-scroll">
             <table>
               <thead><tr><th scope="col">Segment</th><th scope="col">Players</th><th scope="col">Share</th><th scope="col">Sessions / mo.</th><th scope="col">Avg. deposits / mo.</th><th scope="col">90-day retention</th></tr></thead>
@@ -336,8 +326,8 @@
         </div>
 
         <div class="pipeline reveal">
-          <article class="card step"><h3>Build the feature mart</h3><p>Aggregate synthetic session, deposit and product events to one row per player in BigQuery, using a fixed 180-day observation window.</p></article>
-          <article class="card step"><h3>Prepare features</h3><p>Log-transform skewed monetary variables, cap extreme synthetic outliers, impute missing values and standardise all model inputs.</p></article>
+          <article class="card step"><h3>Build the feature mart</h3><p>Aggregate session, deposit and product events to one row per player in BigQuery, using a fixed 180-day observation window.</p></article>
+          <article class="card step"><h3>Prepare features</h3><p>Log-transform skewed monetary variables, cap extreme outliers, impute missing values and standardise all model inputs.</p></article>
           <article class="card step"><h3>Compare solutions</h3><p>Fit K-means for k=3 to k=8 with a fixed seed and multiple initialisations, then compare separation, stability and usefulness.</p></article>
           <article class="card step"><h3>Profile &amp; monitor</h3><p>Name clusters only after reviewing centroids. Track population drift and reassignment stability before operational use.</p></article>
         </div>
@@ -371,11 +361,11 @@
               <div class="score"><strong>14,284</strong><span>Calinski-Harabasz score</span></div>
               <div class="score"><strong>86%</strong><span>Bootstrap assignment stability</span></div>
             </div>
-            <p class="score-note">All diagnostics are deliberately illustrative. Lower Davies-Bouldin is better; higher values are better for the other three metrics.</p>
+            <p class="score-note">Lower Davies-Bouldin is better; higher values are better for the other three metrics.</p>
           </article>
           <article class="card decision-panel">
             <h3>Candidate silhouette comparison</h3>
-            <div class="k-list" aria-label="Illustrative silhouette scores by cluster count">
+            <div class="k-list" aria-label="Silhouette scores by cluster count">
               <div class="k-row"><span>k=3</span><div class="k-bar"><div class="k-fill" style="--width:77%"></div></div><span>0.54</span></div>
               <div class="k-row"><span>k=4</span><div class="k-bar"><div class="k-fill" style="--width:83%"></div></div><span>0.58</span></div>
               <div class="k-row selected"><span>k=5</span><div class="k-bar"><div class="k-fill" style="--width:87%"></div></div><span>0.61</span></div>
@@ -399,7 +389,7 @@
           <p>Segmentation is descriptive, not causal. These findings are hypotheses for prioritisation; campaign impact still requires consent-aware experimentation and incremental measurement.</p>
         </div>
         <div class="insight-grid reveal">
-          <article class="card insight"><span class="insight-num">01 / RETENTION</span><h3>Protect loyalty without over-incentivising.</h3><p>High-Value Loyal profiles represent 11% of the synthetic population and show the strongest retention. Their experience should emphasise reliability and relevance.</p><p class="action"><strong>Test:</strong> service-led recognition against standard bonus-led messaging.</p></article>
+          <article class="card insight"><span class="insight-num">01 / RETENTION</span><h3>Protect loyalty without over-incentivising.</h3><p>High-Value Loyal profiles represent 11% of the population and show the strongest retention. Their experience should emphasise reliability and relevance.</p><p class="action"><strong>Test:</strong> service-led recognition against standard bonus-led messaging.</p></article>
           <article class="card insight"><span class="insight-num">02 / GROWTH</span><h3>Help promising new players form habits.</h3><p>New Growth profiles have encouraging engagement but lower maturity. Product education and well-timed discovery may be more useful than broad promotions.</p><p class="action"><strong>Test:</strong> personalised onboarding journeys with a holdout group.</p></article>
           <article class="card insight"><span class="insight-num">03 / REACTIVATION</span><h3>Detect disengagement before it hardens.</h3><p>At-Risk profiles show low recent activity despite previous value signals. A light-touch, frequency-capped journey can test whether the decline is reversible.</p><p class="action"><strong>Test:</strong> channel and timing combinations, measured on incremental return.</p></article>
         </div>
@@ -417,18 +407,18 @@
   </main>
 
   <footer>
-    <div class="container footer-inner"><span>&copy; <span id="year">2026</span> Viktor Paunovic. Built in Malta.</span><a href="../../index.html#projects">Back to portfolio</a></div>
+    <div class="container"><div class="footer-inner"><span>&copy; <span id="year">2026</span> Viktor Paunovic. Built in Malta.</span><a href="../../index.html#projects">Back to portfolio</a></div><small class="data-disclaimer">All data shown on this page is synthetic and created for portfolio demonstration purposes.</small></div>
   </footer>
 
   <script>
     "use strict";
 
     const segments = [
-      {id:"loyal",name:"High-Value Loyal",short:"High value",color:"#00f5ff",count:5280,share:11,sessions:25.8,deposits:820,retention:88,cx:565,cy:88,sx:54,sy:40,description:"Frequent, recent and high-value synthetic profiles with broad product engagement and consistent activity.",action:"Prioritise recognition, service quality and relevant experiences; avoid unnecessary incentive cost."},
-      {id:"regular",name:"Engaged Regulars",short:"Regulars",color:"#bf00ff",count:14880,share:31,sessions:15.2,deposits:340,retention:76,cx:438,cy:172,sx:70,sy:50,description:"Consistent synthetic profiles with healthy frequency, mid-range value and dependable repeat behaviour.",action:"Deepen product discovery and test personalised cross-sell journeys with controlled holdouts."},
-      {id:"growth",name:"New Growth",short:"New growth",color:"#00ff88",count:10560,share:22,sessions:9.4,deposits:185,retention:61,cx:330,cy:245,sx:58,sy:48,description:"Recently acquired synthetic profiles showing early momentum but not yet a stable long-term pattern.",action:"Use progressive onboarding and education to support habit formation without message overload."},
-      {id:"casual",name:"Casual Explorers",short:"Casual",color:"#f5a623",count:12960,share:27,sessions:4.1,deposits:72,retention:39,cx:205,cy:295,sx:68,sy:46,description:"Low-frequency synthetic profiles who sample products selectively and respond inconsistently over time.",action:"Keep communication low-frequency and test discovery content around demonstrated preferences."},
-      {id:"risk",name:"At-Risk Previously Active",short:"At risk",color:"#ff5daf",count:4320,share:9,sessions:2.3,deposits:95,retention:18,cx:292,cy:120,sx:60,sy:38,description:"Previously active synthetic profiles with a sharp recency decline and lower current engagement.",action:"Test a respectful, frequency-capped reactivation journey and suppress persistent non-responders."}
+      {id:"loyal",name:"High-Value Loyal",short:"High value",color:"#00f5ff",count:5280,share:11,sessions:25.8,deposits:820,retention:88,cx:565,cy:88,sx:54,sy:40,description:"Frequent, recent and high-value profiles with broad product engagement and consistent activity.",action:"Prioritise recognition, service quality and relevant experiences; avoid unnecessary incentive cost."},
+      {id:"regular",name:"Engaged Regulars",short:"Regulars",color:"#bf00ff",count:14880,share:31,sessions:15.2,deposits:340,retention:76,cx:438,cy:172,sx:70,sy:50,description:"Consistent profiles with healthy frequency, mid-range value and dependable repeat behaviour.",action:"Deepen product discovery and test personalised cross-sell journeys with controlled holdouts."},
+      {id:"growth",name:"New Growth",short:"New growth",color:"#00ff88",count:10560,share:22,sessions:9.4,deposits:185,retention:61,cx:330,cy:245,sx:58,sy:48,description:"Recently acquired profiles showing early momentum but not yet a stable long-term pattern.",action:"Use progressive onboarding and education to support habit formation without message overload."},
+      {id:"casual",name:"Casual Explorers",short:"Casual",color:"#f5a623",count:12960,share:27,sessions:4.1,deposits:72,retention:39,cx:205,cy:295,sx:68,sy:46,description:"Low-frequency profiles who sample products selectively and respond inconsistently over time.",action:"Keep communication low-frequency and test discovery content around demonstrated preferences."},
+      {id:"risk",name:"At-Risk Previously Active",short:"At risk",color:"#ff5daf",count:4320,share:9,sessions:2.3,deposits:95,retention:18,cx:292,cy:120,sx:60,sy:38,description:"Previously active profiles with a sharp recency decline and lower current engagement.",action:"Test a respectful, frequency-capped reactivation journey and suppress persistent non-responders."}
     ];
 
     const svg = document.getElementById("segment-scatter");
@@ -498,7 +488,7 @@
       });
       document.querySelectorAll("#segment-scatter g[data-segment]").forEach(group=>{group.style.opacity=id==="all"||group.dataset.segment===id?"1":".16"});
       if(!selected){
-        profile.overline.textContent="Portfolio dataset";profile.title.textContent="All segments";profile.title.style.color="";profile.desc.textContent="A five-cluster view of 48,000 synthetic player profiles, designed to support clear lifecycle and product decisions.";profile.count.textContent="48,000";profile.share.textContent="100%";profile.sessions.textContent="11.0";profile.retention.textContent="57%";profile.action.textContent="Plan differentiated messaging, then validate every intervention with controlled experiments.";return;
+        profile.overline.textContent="Portfolio dataset";profile.title.textContent="All segments";profile.title.style.color="";profile.desc.textContent="A five-cluster view of 48,000 player profiles, designed to support clear lifecycle and product decisions.";profile.count.textContent="48,000";profile.share.textContent="100%";profile.sessions.textContent="11.0";profile.retention.textContent="57%";profile.action.textContent="Plan differentiated messaging, then validate every intervention with controlled experiments.";return;
       }
       profile.overline.textContent="Selected segment";profile.title.textContent=selected.name;profile.title.style.color=selected.color;profile.desc.textContent=selected.description;profile.count.textContent=selected.count.toLocaleString("en-GB");profile.share.textContent=`${selected.share}%`;profile.sessions.textContent=selected.sessions.toFixed(1);profile.retention.textContent=`${selected.retention}%`;profile.action.textContent=selected.action;
     }

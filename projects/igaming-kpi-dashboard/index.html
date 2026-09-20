@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>iGaming KPI Dashboard | Viktor Paunovic</title>
-  <meta name="description" content="An interactive iGaming KPI dashboard case study by Viktor Paunovic, built with clearly labelled synthetic data.">
+  <meta name="description" content="An interactive iGaming KPI dashboard case study by Viktor Paunovic covering revenue, acquisition, retention and player wellbeing.">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://viktorpaunovic.com/projects/igaming-kpi-dashboard/">
   <meta property="og:title" content="iGaming KPI Dashboard | Viktor Paunovic">
-  <meta property="og:description" content="An interactive iGaming KPI dashboard case study built with clearly labelled synthetic data.">
+  <meta property="og:description" content="An interactive iGaming KPI dashboard case study covering revenue, acquisition, retention and player wellbeing.">
   <meta property="og:site_name" content="Viktor Paunovic Portfolio">
   <meta name="twitter:card" content="summary">
   <meta name="theme-color" content="#0a0a0f">
@@ -69,9 +69,6 @@
     .hero-meta{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:1.65rem}
     .pill{display:inline-flex;align-items:center;gap:.45rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);padding:.46rem .78rem;color:var(--soft);font-size:.72rem;font-weight:700}
     .pill i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
-    .pill.synthetic{border-color:rgba(245,166,35,.27);color:#ffd78d;background:rgba(245,166,35,.07)}
-    .hero-notice{margin-top:2.2rem;max-width:860px;display:flex;gap:.8rem;padding:1rem 1.1rem;border:1px solid rgba(245,166,35,.23);border-radius:14px;background:linear-gradient(90deg,rgba(245,166,35,.08),rgba(245,166,35,.025));color:rgba(255,229,182,.82);font-size:.79rem}
-    .hero-notice svg{width:18px;height:18px;flex:0 0 auto;color:var(--amber);margin-top:1px}
 
     .section{padding:2rem 0 5.5rem}
     .section-head{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.4rem}
@@ -124,7 +121,7 @@
     .rg-list{display:grid;gap:.65rem}.rg-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.65rem;border:1px solid var(--line);border-radius:11px;padding:.62rem .7rem;background:rgba(255,255,255,.018)}
     .rg-icon{display:grid;place-items:center;width:29px;height:29px;border-radius:8px;background:rgba(0,255,136,.08);color:var(--green)}.rg-icon.amber{color:var(--amber);background:rgba(245,166,35,.08)}.rg-icon svg{width:15px}
     .rg-name{font-size:.68rem;font-weight:750}.rg-detail{font-size:.59rem;color:var(--muted)}.rg-metric{text-align:right;font-size:.7rem;font-weight:800;color:var(--green)}.rg-metric.amber{color:var(--amber)}
-    .synthetic-foot{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:1rem;color:var(--muted);font-size:.62rem}
+    .dashboard-status{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line);color:var(--muted);font-size:.62rem;text-align:right}
 
     .cohort-card{padding:1.2rem;overflow:hidden}
     .cohort-scroll{overflow-x:auto;padding-bottom:.35rem}
@@ -153,7 +150,7 @@
     .cta::after{content:"";position:absolute;right:-80px;top:-110px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,245,255,.15),transparent 68%)}
     .cta-copy{position:relative;z-index:1}.cta h2{margin-bottom:.4rem}.cta p{color:var(--muted);font-size:.82rem;max-width:620px}.cta-actions{position:relative;z-index:1;display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end}
     .button.secondary{color:#fff;background:rgba(255,255,255,.035);border-color:var(--line);box-shadow:none}.button.secondary:hover{border-color:rgba(0,245,255,.3);background:rgba(0,245,255,.06)}
-    footer{border-top:1px solid var(--line);padding:1.8rem 0 2.4rem;color:rgba(255,255,255,.32);font-size:.68rem}.footer-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}.footer-row a{text-decoration:none}.footer-row a:hover{color:var(--cyan)}
+    footer{border-top:1px solid var(--line);padding:1.8rem 0 2.4rem;color:rgba(255,255,255,.32);font-size:.68rem}.footer-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}.footer-row a{text-decoration:none}.footer-row a:hover{color:var(--cyan)}.data-disclaimer{display:block;margin-top:.8rem;text-align:center;color:rgba(255,255,255,.25);font-size:.56rem;line-height:1.5}
 
     .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}.reveal.visible{opacity:1;transform:none}
     @media(max-width:1050px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.story-grid{grid-template-columns:1fr 1fr}.story-card:last-child{grid-column:1/-1}.method{grid-template-columns:1fr}.chart-grid{grid-template-columns:minmax(0,1.5fr) minmax(230px,.75fr)}}
@@ -191,23 +188,18 @@
       <div class="hero-meta" aria-label="Project details">
         <span class="pill"><i></i> Interactive demo</span>
         <span class="pill">SQL · Tableau · Python</span>
-        <span class="pill">Jan–Jun 2026 sample period</span>
-        <span class="pill synthetic">Synthetic data only</span>
-      </div>
-      <div class="hero-notice" role="note">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-9h.01"/></svg>
-        <p><strong>Illustrative portfolio project.</strong> Every player count, market, trend and monetary value on this page is invented for demonstration. It does not represent a real operator, customer or production dataset.</p>
+        <span class="pill">Jan–Jun 2026 reporting period</span>
       </div>
     </section>
 
     <section class="section shell reveal" aria-labelledby="dashboard-title">
       <div class="section-head">
         <div><div class="section-kicker">Interactive overview</div><h2 id="dashboard-title">Executive performance cockpit</h2></div>
-        <p class="section-note">Change the period and market to explore a deterministic synthetic scenario. Comparisons use the preceding equivalent period.</p>
+        <p class="section-note">Change the period and market to explore the reporting scenario. Comparisons use the preceding equivalent period.</p>
       </div>
       <div class="dashboard glass">
         <div class="dash-toolbar">
-          <div class="dash-title"><span class="live-dot" aria-hidden="true"></span>Portfolio analytics demo <span class="pill synthetic">Dummy</span></div>
+          <div class="dash-title"><span class="live-dot" aria-hidden="true"></span>Portfolio analytics demo</div>
           <div class="filters" aria-label="Dashboard filters">
             <div class="segmented" role="group" aria-label="Reporting period">
               <button class="range-btn" type="button" data-range="30">30D</button>
@@ -231,7 +223,7 @@
           <article class="chart-card">
             <div class="chart-head"><div><h3>Daily net gaming revenue</h3><p class="chart-sub" id="trend-subtitle">90-day trend · all markets</p></div><div class="chart-total">Period movement<b id="trend-movement">+12.4%</b></div></div>
             <svg id="revenue-chart" viewBox="0 0 720 250" role="img" aria-labelledby="trend-title trend-desc">
-              <title id="trend-title">Net gaming revenue trend</title><desc id="trend-desc">Synthetic daily net gaming revenue for the selected reporting period and market.</desc>
+              <title id="trend-title">Net gaming revenue trend</title><desc id="trend-desc">Daily net gaming revenue for the selected reporting period and market.</desc>
               <defs><linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00f5ff" stop-opacity=".30"/><stop offset="1" stop-color="#00f5ff" stop-opacity="0"/></linearGradient></defs>
               <g id="chart-gridlines"></g><path class="area" id="trend-area"></path><path class="trend-line" id="trend-path"></path><g id="trend-points"></g><g id="chart-labels"></g>
             </svg>
@@ -249,20 +241,20 @@
             <div id="source-bars"></div>
           </article>
           <article class="chart-card">
-            <div class="chart-head"><div><h3>Player wellbeing signals</h3><p class="chart-sub">Operational monitoring · not a clinical assessment</p></div><span class="pill synthetic">Illustrative</span></div>
+            <div class="chart-head"><div><h3>Player wellbeing signals</h3><p class="chart-sub">Operational monitoring · not a clinical assessment</p></div></div>
             <div class="rg-list">
               <div class="rg-row"><span class="rg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg></span><span><span class="rg-name">Deposit limits enabled</span><span class="rg-detail">Share of monthly active players</span></span><strong class="rg-metric" id="rg-limits">28.4%</strong></div>
               <div class="rg-row"><span class="rg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span><span class="rg-name">Reality checks used</span><span class="rg-detail">Session reminder interaction rate</span></span><strong class="rg-metric" id="rg-checks">14.7%</strong></div>
-              <div class="rg-row"><span class="rg-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M4 20h16L12 4z"/></svg></span><span><span class="rg-name">Review queue</span><span class="rg-detail">Synthetic rule-based flags awaiting review</span></span><strong class="rg-metric amber" id="rg-reviews">126</strong></div>
+              <div class="rg-row"><span class="rg-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M4 20h16L12 4z"/></svg></span><span><span class="rg-name">Review queue</span><span class="rg-detail">Rule-based flags awaiting review</span></span><strong class="rg-metric amber" id="rg-reviews">126</strong></div>
             </div>
           </article>
         </div>
-        <div class="synthetic-foot"><span>Generated sample dataset · refreshed for this demo on page load</span><span id="dashboard-status">90 days · All markets</span></div>
+        <div class="dashboard-status" id="dashboard-status">90 days · All markets</div>
       </div>
     </section>
 
     <section class="section shell reveal" aria-labelledby="cohort-title">
-      <div class="section-head"><div><div class="section-kicker">Retention analysis</div><h2 id="cohort-title">Monthly player cohorts</h2></div><p class="section-note">Each row follows a synthetic first-deposit cohort. Values show the share returning in each subsequent month.</p></div>
+      <div class="section-head"><div><div class="section-kicker">Retention analysis</div><h2 id="cohort-title">Monthly player cohorts</h2></div><p class="section-note">Each row follows a first-deposit cohort. Values show the share returning in each subsequent month.</p></div>
       <div class="cohort-card glass">
         <div class="cohort-scroll" role="region" aria-label="Scrollable cohort retention table" tabindex="0">
           <table class="cohort-table">
@@ -282,9 +274,9 @@
     </section>
 
     <section class="section shell reveal" aria-labelledby="insights-title">
-      <div class="section-head"><div><div class="section-kicker">From metrics to action</div><h2 id="insights-title">Illustrative stakeholder insights</h2></div><p class="section-note">Hypotheses are separated from observations so decisions are not presented as proven causality.</p></div>
+      <div class="section-head"><div><div class="section-kicker">From metrics to action</div><h2 id="insights-title">Stakeholder insights</h2></div><p class="section-note">Hypotheses are separated from observations so decisions are not presented as proven causality.</p></div>
       <div class="story-grid">
-        <article class="story-card glass"><span class="story-number" aria-hidden="true">01</span><span class="story-label">Observation</span><h3>Casino growth leads the period</h3><p>Slots and live casino contribute 73% of synthetic GGR, while period NGR increases 7.2% against the previous comparable window.</p><div class="action"><b>Next step</b><span>Validate whether the lift is broad-based or concentrated in a small player group.</span></div></article>
+        <article class="story-card glass"><span class="story-number" aria-hidden="true">01</span><span class="story-label">Observation</span><h3>Casino growth leads the period</h3><p>Slots and live casino contribute 73% of GGR, while period NGR increases 7.2% against the previous comparable window.</p><div class="action"><b>Next step</b><span>Validate whether the lift is broad-based or concentrated in a small player group.</span></div></article>
         <article class="story-card glass"><span class="story-number" aria-hidden="true">02</span><span class="story-label">Hypothesis</span><h3>Onboarding may be improving</h3><p>Later cohorts retain more strongly at M1. This could reflect campaign quality, product changes or seasonality; the dashboard alone cannot prove why.</p><div class="action"><b>Next step</b><span>Run a controlled cohort comparison by channel, market and welcome journey.</span></div></article>
         <article class="story-card glass"><span class="story-number" aria-hidden="true">03</span><span class="story-label">Action</span><h3>Balance growth with wellbeing</h3><p>Commercial metrics are paired with limit adoption, reality-check use and review volume to keep safer-gambling monitoring visible.</p><div class="action"><b>Next step</b><span>Review alert service levels and segment exposure before scaling campaigns.</span></div></article>
       </div>
@@ -303,12 +295,12 @@
     </section>
 
     <section class="cta shell glass reveal" aria-labelledby="cta-title">
-      <div class="cta-copy"><div class="section-kicker">Continue exploring</div><h2 id="cta-title">Want to discuss the analysis?</h2><p>I can walk through the KPI definitions, data model, dashboard decisions and how this synthetic concept could translate to a governed production workflow.</p></div>
+      <div class="cta-copy"><div class="section-kicker">Continue exploring</div><h2 id="cta-title">Want to discuss the analysis?</h2><p>I can walk through the KPI definitions, data model, dashboard decisions and how this concept could translate to a governed production workflow.</p></div>
       <div class="cta-actions"><a class="button secondary" href="../../index.html#projects">View all projects</a><a class="button" href="../../index.html#links">Contact me</a></div>
     </section>
   </main>
 
-  <footer><div class="footer-row shell"><span>© 2026 Viktor Paunovic · Synthetic portfolio case study</span><a href="../../index.html#projects">Back to portfolio projects ↑</a></div></footer>
+  <footer><div class="shell"><div class="footer-row"><span>© 2026 Viktor Paunovic · iGaming KPI Dashboard</span><a href="../../index.html#projects">Back to portfolio projects ↑</a></div><small class="data-disclaimer">All data shown on this page is synthetic and created for portfolio demonstration purposes.</small></div></footer>
   <div class="chart-tooltip" id="chart-tooltip" role="status"></div>
 
   <script>

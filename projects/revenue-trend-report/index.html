@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="An interactive, illustrative revenue trend report case study built with synthetic data by Viktor Paunovic.">
+  <meta name="description" content="An interactive revenue trend report case study by Viktor Paunovic covering revenue, budget, margin and market performance.">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://viktorpaunovic.com/projects/revenue-trend-report/">
   <meta property="og:title" content="Revenue Trend Report | Viktor Paunovic">
-  <meta property="og:description" content="An interactive revenue trend report case study built with clearly labelled synthetic data.">
+  <meta property="og:description" content="An interactive revenue trend report case study covering revenue, budget, margin and market performance.">
   <meta property="og:site_name" content="Viktor Paunovic Portfolio">
   <meta name="twitter:card" content="summary">
   <meta name="theme-color" content="#0a0a0f">
@@ -84,8 +84,6 @@
     .period-btn:hover{color:#fff;background:rgba(255,255,255,.04)}
     .period-btn[aria-pressed="true"]{color:var(--green);background:rgba(0,255,136,.09);border-color:rgba(0,255,136,.22)}
     .report-body{padding:1.15rem}
-    .notice{display:flex;align-items:flex-start;gap:.65rem;margin-bottom:1rem;padding:.72rem .9rem;border:1px solid rgba(245,166,35,.2);border-radius:12px;background:rgba(245,166,35,.055);color:rgba(255,225,177,.75);font-size:.72rem}
-    .notice svg{width:15px;height:15px;flex:none;margin-top:2px;color:var(--amber)}
     .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem}
     .kpi{position:relative;min-height:142px;padding:1.05rem;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(255,255,255,.034),rgba(255,255,255,.012));overflow:hidden}
     .kpi::after{content:"";position:absolute;left:1.05rem;right:55%;bottom:0;height:1px;background:var(--kpi-color,var(--green));box-shadow:0 0 12px var(--kpi-color,var(--green))}
@@ -137,7 +135,7 @@
     .cta{padding:5rem 0 6.5rem}.cta-box{display:flex;justify-content:space-between;align-items:center;gap:2rem;padding:clamp(1.5rem,4vw,3rem);border:1px solid rgba(0,255,136,.22);border-radius:24px;background:linear-gradient(120deg,rgba(0,255,136,.085),rgba(0,245,255,.035),rgba(191,0,255,.035));box-shadow:var(--shadow)}
     .cta-box h2{font-size:clamp(1.7rem,3vw,2.5rem)}.cta-box p{max-width:650px;margin-top:.65rem;color:var(--muted);font-size:.88rem}
     .cta-button{flex:none;display:inline-flex;align-items:center;gap:.55rem;padding:.8rem 1.15rem;border-radius:999px;background:var(--green);color:#06110c;text-decoration:none;font-size:.82rem;font-weight:800;transition:transform .25s,box-shadow .25s}.cta-button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,255,136,.22)}
-    footer{padding:1.7rem 0;border-top:1px solid var(--line);color:var(--dim);font-size:.72rem}.footer-inner{display:flex;justify-content:space-between;gap:1rem}.footer-inner a{text-decoration:none}.footer-inner a:hover{color:var(--green)}
+    footer{padding:1.7rem 0;border-top:1px solid var(--line);color:var(--dim);font-size:.72rem}.footer-inner{display:flex;justify-content:space-between;gap:1rem}.footer-inner a{text-decoration:none}.footer-inner a:hover{color:var(--green)}.data-disclaimer{display:block;margin-top:.8rem;text-align:center;color:rgba(240,240,255,.24);font-size:.56rem;line-height:1.5}
     .reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}.reveal.visible{opacity:1;transform:none}
     @media(max-width:980px){.hero-grid{grid-template-columns:1fr}.hero-aside{max-width:580px}.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid,.bottom-grid{grid-template-columns:1fr}.story-grid{grid-template-columns:1fr 1fr}.method-grid{grid-template-columns:1fr}.section-intro{text-align:left}.section-head{align-items:start;flex-direction:column;gap:.8rem}}
     @media(max-width:680px){.shell{width:min(100% - 1.35rem,1320px)}.topbar-inner{min-height:64px}.brand span:last-child{display:none}.nav-link{padding:.5rem}.nav-link span{display:none}.hero{padding-top:3.5rem}.hero-grid{gap:2rem}.report-bar{align-items:flex-start;flex-direction:column}.report-body{padding:.7rem}.kpi-grid{grid-template-columns:1fr}.story-grid{grid-template-columns:1fr}.chart-card{padding:.85rem}.section{padding:4rem 0}.cta-box{align-items:flex-start;flex-direction:column}.footer-inner{flex-direction:column}.legend{justify-content:flex-start}.chart-head{flex-direction:column}}
@@ -172,9 +170,9 @@
             <span class="tag">Power BI</span><span class="tag">DAX</span><span class="tag">SQL</span><span class="tag">Financial Analysis</span><span class="tag">Data Storytelling</span>
           </div>
         </div>
-        <aside class="hero-aside" aria-label="Data disclosure">
-          <span class="data-badge">Illustrative dataset</span>
-          <p>Every value on this page is synthetic and was created solely to demonstrate reporting, modelling and visual analysis skills. It does not represent a real company.</p>
+        <aside class="hero-aside" aria-label="Report scope">
+          <span class="data-badge">Report scope</span>
+          <p>Executive view of revenue, budget, contribution margin and market performance.</p>
           <div class="mini-stat"><span>Reporting period</span><strong>FY 2025</strong></div>
         </aside>
       </div>
@@ -202,8 +200,6 @@
           </div>
 
           <div class="report-body">
-            <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/></svg><span><strong>Synthetic data:</strong> the financial values and business observations below are illustrative portfolio content, not audited results.</span></div>
-
             <div class="kpi-grid" aria-live="polite" aria-atomic="true">
               <article class="kpi" style="--kpi-color:var(--green)"><div class="kpi-top"><span class="kpi-label">Net revenue</span><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div><div class="kpi-value" id="revenue-kpi">€0</div><div class="kpi-detail"><span class="trend-pill good" id="growth-pill">0%</span><span>vs comparable prior period</span></div></article>
               <article class="kpi" style="--kpi-color:var(--cyan)"><div class="kpi-top"><span class="kpi-label">Contribution profit</span><span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 17 6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg></span></div><div class="kpi-value" id="profit-kpi">€0</div><div class="kpi-detail"><span class="trend-pill good" id="margin-pill">0%</span><span>contribution margin</span></div></article>
@@ -214,7 +210,7 @@
             <div class="charts-grid">
               <article class="chart-card" id="trend-card">
                 <div class="chart-head"><div><div class="chart-title">Revenue vs budget</div><div class="chart-sub" id="trend-summary">Monthly net revenue and plan</div></div><div class="legend" aria-hidden="true"><span><i style="background:var(--green)"></i>Revenue</span><span><i style="background:var(--amber)"></i>Budget</span></div></div>
-                <svg class="chart-svg" id="trend-chart" viewBox="0 0 760 300" role="img" aria-label="Line chart comparing synthetic monthly revenue and budget"></svg>
+                <svg class="chart-svg" id="trend-chart" viewBox="0 0 760 300" role="img" aria-label="Line chart comparing monthly revenue and budget"></svg>
                 <div class="tooltip" id="chart-tooltip" role="status"></div>
               </article>
               <article class="chart-card">
@@ -242,7 +238,7 @@
       <div class="shell">
         <div class="section-head reveal"><div><div class="section-label">Business interpretation</div><h2 id="story-heading">From movement to action</h2></div><p class="section-intro">The report is designed around the questions finance leaders ask first: what changed, where it changed and which response deserves priority.</p></div>
         <div class="story-grid">
-          <article class="story-card reveal"><span class="story-index">01 / OBSERVE</span><h3>Momentum strengthened</h3><p>Illustrative revenue finishes above plan as the second half outperforms the first, with Q4 providing the strongest quarterly contribution.</p></article>
+          <article class="story-card reveal"><span class="story-index">01 / OBSERVE</span><h3>Momentum strengthened</h3><p>Revenue finishes above plan as the second half outperforms the first, with Q4 providing the strongest quarterly contribution.</p></article>
           <article class="story-card reveal"><span class="story-index">02 / EXPLAIN</span><h3>Mix supports margin</h3><p>Higher-value Casino and Live Casino activity expands the contribution base while Sportsbook remains the largest single product vertical.</p></article>
           <article class="story-card reveal"><span class="story-index">03 / ACT</span><h3>Protect efficient growth</h3><p>Prioritise retention in high-growth markets and review acquisition efficiency before increasing spend in slower regional segments.</p></article>
         </div>
@@ -271,7 +267,7 @@
     </section>
   </main>
 
-  <footer><div class="shell footer-inner"><span>© 2026 Viktor Paunovic · Revenue Trend Report</span><span>Illustrative case study · <a href="../../index.html#projects">Back to projects</a></span></div></footer>
+  <footer><div class="shell"><div class="footer-inner"><span>© 2026 Viktor Paunovic · Revenue Trend Report</span><a href="../../index.html#projects">Back to projects</a></div><small class="data-disclaimer">All data shown on this page is synthetic and created for portfolio demonstration purposes.</small></div></footer>
 
   <script>
     "use strict";
@@ -364,7 +360,7 @@
         <path d="${revenuePath}" class="chart-line" stroke="#00ff88" stroke-width="3"/>
         ${rows.map((row,index) => `<g class="chart-point" data-index="${index}" tabindex="0" role="img" aria-label="${row.m}: revenue ${money(row.r)}, budget ${money(row.b)}"><circle cx="${x(index)}" cy="${y(row.r)}" r="10" fill="transparent"/><circle cx="${x(index)}" cy="${y(row.r)}" r="3.5" fill="#00ff88" stroke="#08100c" stroke-width="2"/><text x="${x(index)}" y="${H-12}" text-anchor="middle" class="axis-text">${row.m}</text></g>`).join("")}
       `;
-      svg.setAttribute("aria-label",`${label}: line chart comparing synthetic revenue and budget. Revenue ranges from ${money(Math.min(...rows.map(r=>r.r)))} to ${money(Math.max(...rows.map(r=>r.r)))}.`);
+      svg.setAttribute("aria-label",`${label}: line chart comparing revenue and budget. Revenue ranges from ${money(Math.min(...rows.map(r=>r.r)))} to ${money(Math.max(...rows.map(r=>r.r)))}.`);
       $("#trend-summary").textContent = `${label} monthly net revenue and plan`;
       bindTrendInteractions(rows);
     }
@@ -411,7 +407,7 @@
       const items=[
         ["Budget position",`${metrics.label} closed ${Math.abs(metrics.variance).toFixed(1)}% ${varianceText} plan, with ${aboveBudget} of ${totalMonths} months meeting or exceeding budget.`],
         ["Period momentum",`Revenue moved ${pct(momentum)} from ${first.m} to ${last.m}; ${metrics.best.m} was the strongest month at ${money(metrics.best.r)}.`],
-        ["Margin signal",`Synthetic contribution margin reached ${metrics.margin.toFixed(1)}%, leaving ${money(metrics.revenue-sum(metrics.rows,"c"))} after modelled variable costs.`]
+        ["Margin signal",`Contribution margin reached ${metrics.margin.toFixed(1)}%, leaving ${money(metrics.revenue-sum(metrics.rows,"c"))} after modelled variable costs.`]
       ];
       $("#insight-list").innerHTML=items.map((item,index) => `<li><span class="insight-num">0${index+1}</span><span><strong>${item[0]}</strong>${item[1]}</span></li>`).join("");
     }
