@@ -1,0 +1,9 @@
+# Netlify response headers.
+# Files in vendor/ and fonts/ carry their version in the file name, so they can be
+# cached for a year. Give an upgraded file a new name rather than overwriting it.
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *

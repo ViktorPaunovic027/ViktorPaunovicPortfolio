@@ -1,135 +1,58 @@
 # Viktor Paunovic — Data Analyst Portfolio
 
-A static personal portfolio with a self-contained home page and three project case-study pages. There is no build step or dependency installation; just open and edit the HTML files.
+Live site: **https://viktorpaunovic.com** (Netlify, deployed from `main`).
 
-**Live demo:** _(add your Netlify URL here after deploying)_
-
----
-
-## What's inside
-
-- Three.js animated molecule (hero centerpiece)
-- React 18 iGaming Analytics Dashboard (KPIs, charts, filters, tooltips) — loaded via Babel standalone, no build step
-- Custom neon cursor with particle trail
-- Typewriter hero subtitle, animated counters, tilt-card effects
-- 60fps smooth scroll for nav + back-to-top
-- Mobile hamburger drawer with staggered link animation
-- Scroll progress bar, Web Audio click/whoosh SFX
-- Glassmorphism dark theme (cyan / purple / green)
-- Three responsive project case studies with clearly labelled synthetic demonstration data
+A static portfolio: one home page and three project case-study pages. Netlify runs no build. The only compiled file, `js/dashboard.min.js`, is committed.
 
 ---
 
-## Push to GitHub
+## Structure
 
-From inside the `portfolio` folder, open a terminal and run:
-
-```bash
-git init
-git add .
-git commit -m "Initial portfolio"
-git branch -M main
+```
+index.html                 home page markup (meta tags, sections, static SVG molecule)
+css/main.css               home page styles
+js/main.js                 home page script: loader, particles, cursor, nav, lazy loading
+src/dashboard.jsx          dashboard source (React + JSX). Edit this file…
+js/dashboard.min.js        …then rebuild this one (see below). Committed.
+vendor/                    pinned React 18.3.1, ReactDOM 18.3.1, three.js r128
+fonts/                     self-hosted Inter and Space Grotesk (variable, latin subset)
+projects/<name>/index.html case studies; each has its own inline CSS and JS
+og-image.svg / .png        social preview image (the PNG is what the meta tags use)
+_headers                   Netlify cache rules for vendor/ and fonts/
+sitemap.xml, robots.txt
 ```
 
-Then create a new empty repo on https://github.com/new (name it `portfolio` or `viktor-paunovic.github.io` — anything you like, no README/license/gitignore on the GitHub side).
+## How the home page loads
 
-GitHub will show you the remote URL. Paste it into the next command:
+- **Intro:** the loader plays once per browser session (about 2.2 s). Repeat visits, and visitors who prefer reduced motion, go straight to the page. A failsafe in `<head>` shows the page after 5 s if `js/main.js` never runs.
+- **Molecule:** the hero shows a static SVG molecule first. On desktop, three.js loads after the hero is visible and fades the 3D version in. Phones and reduced-motion visitors keep the SVG.
+- **Dashboard:** React and the dashboard load only when the visitor scrolls near the Analytics section.
+- **Without JavaScript:** all content still shows.
 
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git push -u origin main
-```
+## Editing the dashboard
 
-That's it — your code is on GitHub.
-
----
-
-## Deploy to Netlify (connected to GitHub)
-
-1. Go to https://app.netlify.com/start and sign in with your GitHub account.
-2. Click **Import an existing project** → **Deploy with GitHub**.
-3. Authorize Netlify, then pick the repo you just pushed.
-4. Settings — leave everything at default:
-   - **Build command:** (leave empty)
-   - **Publish directory:** `.` (a single dot, meaning the project root)
-5. Click **Deploy site**.
-
-In ~10 seconds you'll have a live URL like `https://random-name-12345.netlify.app`.
-
-### Rename the URL
-
-In your Netlify site dashboard:
-**Site configuration → Change site name** → set it to something like `viktor-paunovic` → your URL becomes `viktor-paunovic.netlify.app`.
-
-### Custom domain (optional, free)
-
-If you buy a domain (e.g. on Namecheap, Cloudflare, or Porkbun), Netlify's **Domain management** lets you connect it and provisions HTTPS automatically.
-
-### Automatic deploys
-
-Any future `git push` to `main` triggers a redeploy. To update the site:
+Edit `src/dashboard.jsx`, then rebuild (needs Node; nothing is added to the repo):
 
 ```bash
-git add .
-git commit -m "Update content"
-git push
+npx --yes esbuild@0.28.2 src/dashboard.jsx --jsx=transform --format=iife --minify --target=es2019 --outfile=js/dashboard.min.js
 ```
 
-Netlify rebuilds in seconds.
+Commit both files. If the dashboard's layout changes height, update the `#db-root` `min-height` values in `css/main.css`, which reserve its space while it loads.
 
----
+## Updating the libraries
 
-## Alternative: Netlify drag-and-drop (no GitHub needed)
+The libraries are saved in `vendor/` with the version in the file name, so they never change silently. To upgrade, download the new file under a new name and update the path in `js/main.js`.
 
-If you just want to test quickly without GitHub:
+## Demo data
 
-1. Go to https://app.netlify.com/drop
-2. Drag the entire `portfolio` folder into the browser window
-3. Site is live in 5 seconds
-
-You lose auto-redeploys this way — every update means dragging the folder again.
-
----
-
-## Project data and links
-
-The three project cards are connected to their case-study pages by a small script immediately after the unchanged Projects section in `index.html`.
-
-All project metrics are invented, synthetic demonstration data. Replace them with validated source data before presenting the pages as real business results.
-
----
+The dashboard and the three case studies use synthetic data. The home page says so in the footer, and each case study says so on its own page. Replace the data with validated source data before presenting anything as real results.
 
 ## Local preview
 
-Any static file server works. Two easy options:
-
 ```bash
-# Option 1: Node (no install needed if you have npx)
-npx serve . --listen 3000
-
-# Option 2: Python
+npx serve .
+# or
 python -m http.server 8080
 ```
 
-Then open http://localhost:3000 (or 8080).
-
----
-
-## Project structure
-
-```
-portfolio/
-  index.html                        ← portfolio home page
-  projects/
-    igaming-kpi-dashboard/
-      index.html                    ← iGaming KPI case study
-    player-segmentation-model/
-      index.html                    ← player clustering case study
-    revenue-trend-report/
-      index.html                    ← revenue reporting case study
-  sitemap.xml                       ← public URLs for search engines
-  robots.txt                        ← crawler rules and sitemap location
-  README.md                         ← you're reading it
-```
-
-No build step, package manager, or framework lock-in is required.
+Test the changes locally before pushing. Every push to `main` deploys.

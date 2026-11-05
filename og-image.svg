@@ -1,84 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <title>Viktor Paunovic — Data Analyst, Malta</title>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0a0f"/>
-      <stop offset="50%" stop-color="#0d0d1a"/>
-      <stop offset="100%" stop-color="#0a0a0f"/>
+      <stop offset="0" stop-color="#0a0a0f"/><stop offset=".5" stop-color="#0d0d1a"/><stop offset="1" stop-color="#0a0a0f"/>
     </linearGradient>
-    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#00f5ff"/>
-      <stop offset="100%" stop-color="#bf00ff"/>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00f5ff"/><stop offset="1" stop-color="#bf00ff"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.85" cy="0.5" r="0.5">
-      <stop offset="0%" stop-color="#00f5ff" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#00f5ff" stop-opacity="0"/>
+    <radialGradient id="glow" cx=".8" cy=".48" r=".45">
+      <stop offset="0" stop-color="#00f5ff" stop-opacity=".16"/><stop offset=".55" stop-color="#bf00ff" stop-opacity=".06"/><stop offset="1" stop-color="#bf00ff" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="glow2" cx="0.15" cy="0.85" r="0.4">
-      <stop offset="0%" stop-color="#bf00ff" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#bf00ff" stop-opacity="0"/>
+    <radialGradient id="glow2" cx=".1" cy=".95" r=".45">
+      <stop offset="0" stop-color="#bf00ff" stop-opacity=".14"/><stop offset="1" stop-color="#bf00ff" stop-opacity="0"/>
     </radialGradient>
-    <filter id="blur"><feGaussianBlur stdDeviation="4"/></filter>
   </defs>
+  <defs><radialGradient id="mol-c" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#e8ffff"/><stop offset=".45" stop-color="#00f5ff"/><stop offset="1" stop-color="#007a85"/></radialGradient><radialGradient id="mol-p" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#f6e0ff"/><stop offset=".45" stop-color="#bf00ff"/><stop offset="1" stop-color="#5c0080"/></radialGradient></defs>
 
   <!-- Background -->
   <rect width="1200" height="630" fill="url(#bg)"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
   <rect width="1200" height="630" fill="url(#glow2)"/>
-
-  <!-- Grid -->
-  <g opacity="0.06" stroke="#00f5ff" stroke-width="1">
-    <path d="M0 100 H1200 M0 200 H1200 M0 300 H1200 M0 400 H1200 M0 500 H1200"/>
-    <path d="M100 0 V630 M200 0 V630 M300 0 V630 M400 0 V630 M500 0 V630 M600 0 V630 M700 0 V630 M800 0 V630 M900 0 V630 M1000 0 V630 M1100 0 V630"/>
+  <g opacity=".05" stroke="#00f5ff" stroke-width="1">
+    <path d="M0 105H1200M0 210H1200M0 315H1200M0 420H1200M0 525H1200"/>
+    <path d="M100 0V630M200 0V630M300 0V630M400 0V630M500 0V630M600 0V630M700 0V630M800 0V630M900 0V630M1000 0V630M1100 0V630"/>
   </g>
 
-  <!-- Decorative molecule (right side) -->
-  <g transform="translate(900,315)" opacity="0.85">
-    <g stroke="#00f5ff" stroke-width="1.4" opacity="0.4">
-      <line x1="-100" y1="-90" x2="0" y2="0"/>
-      <line x1="100" y1="-90" x2="0" y2="0"/>
-      <line x1="-100" y1="-90" x2="100" y2="-90"/>
-      <line x1="-110" y1="80" x2="0" y2="0"/>
-      <line x1="110" y1="80" x2="0" y2="0"/>
-      <line x1="-110" y1="80" x2="110" y2="80"/>
-      <line x1="-100" y1="-90" x2="-110" y2="80"/>
-      <line x1="100" y1="-90" x2="110" y2="80"/>
-      <line x1="0" y1="0" x2="0" y2="130"/>
-      <line x1="-110" y1="80" x2="0" y2="130"/>
-      <line x1="110" y1="80" x2="0" y2="130"/>
+  <!-- Molecule (same geometry as the site's hero) -->
+  <svg x="700" y="85" width="460" height="460" viewBox="0 0 400 400" overflow="visible">
+<g fill="#00f5ff" opacity=".4"><circle cx="6.8" cy="163.6" r="0.9"/><circle cx="315.5" cy="4.1" r="1.1"/><circle cx="168.6" cy="91.1" r="0.8"/><circle cx="336.6" cy="323" r="0.9"/><circle cx="92.9" cy="301.6" r="0.7"/><circle cx="247.6" cy="139.3" r="0.8"/><circle cx="268.7" cy="278.6" r="1"/><circle cx="251.9" cy="242.9" r="0.8"/><circle cx="78.7" cy="209.6" r="1.2"/><circle cx="106.7" cy="182.4" r="0.7"/><circle cx="122" cy="138.9" r="0.7"/><circle cx="343.8" cy="275.9" r="0.9"/><circle cx="245.9" cy="299.1" r="0.7"/><circle cx="333.5" cy="259.5" r="0.9"/><circle cx="73.9" cy="315.1" r="0.8"/><circle cx="175.1" cy="262.2" r="1.1"/><circle cx="110.9" cy="260.9" r="0.8"/><circle cx="205.2" cy="165.7" r="1.4"/><circle cx="60.7" cy="195.1" r="0.7"/><circle cx="178.6" cy="298.2" r="0.8"/><circle cx="0.6" cy="339.4" r="1.4"/><circle cx="374.2" cy="128" r="0.9"/><circle cx="89.6" cy="106.1" r="0.8"/><circle cx="154.8" cy="253.8" r="1.1"/><circle cx="44.2" cy="124.8" r="0.8"/><circle cx="35.8" cy="41.4" r="0.9"/><circle cx="145.6" cy="319.4" r="0.7"/><circle cx="55.9" cy="175.4" r="0.9"/><circle cx="108.2" cy="309.6" r="0.8"/><circle cx="129" cy="219.8" r="1"/><circle cx="53" cy="102.1" r="0.7"/><circle cx="90.3" cy="355.8" r="0.7"/><circle cx="350.6" cy="259.5" r="0.7"/><circle cx="85.7" cy="288.4" r="0.8"/><circle cx="214" cy="372.4" r="0.9"/><circle cx="347.4" cy="310" r="0.7"/><circle cx="268.3" cy="310" r="1.3"/><circle cx="92.2" cy="254.3" r="1"/><circle cx="223.4" cy="118.1" r="0.8"/><circle cx="170.2" cy="285.8" r="0.8"/><circle cx="133.5" cy="20.3" r="1"/><circle cx="214.6" cy="80.9" r="1.2"/><circle cx="346.6" cy="119.7" r="0.7"/><circle cx="380.9" cy="256" r="1.1"/><circle cx="250.7" cy="252.8" r="0.7"/><circle cx="121.2" cy="350.4" r="1.7"/><circle cx="62" cy="163.8" r="1.5"/><circle cx="141.9" cy="58.8" r="0.7"/><circle cx="263.9" cy="290.6" r="1"/><circle cx="105.3" cy="157.2" r="0.8"/><circle cx="164.8" cy="151.2" r="0.7"/><circle cx="104.6" cy="340" r="1.1"/><circle cx="87.1" cy="386.7" r="0.9"/><circle cx="266.6" cy="255.4" r="0.7"/><circle cx="381.9" cy="269.8" r="1.2"/><circle cx="51.3" cy="316.3" r="0.7"/><circle cx="139.2" cy="175.2" r="1.3"/><circle cx="385.1" cy="327.9" r="0.9"/><circle cx="150.5" cy="175" r="1.1"/><circle cx="304.3" cy="146.4" r="0.9"/><circle cx="244.6" cy="282" r="0.8"/><circle cx="274.7" cy="69.1" r="1.5"/><circle cx="286.3" cy="84.2" r="0.7"/><circle cx="354.9" cy="389.5" r="0.9"/><circle cx="224.5" cy="80" r="0.7"/><circle cx="141.6" cy="344.6" r="0.7"/><circle cx="354.7" cy="257.8" r="1.1"/><circle cx="217.4" cy="310" r="0.7"/><circle cx="229.4" cy="35" r="1"/><circle cx="216.9" cy="384.1" r="1.1"/><circle cx="121" cy="218.1" r="0.8"/><circle cx="161.2" cy="288.5" r="0.7"/><circle cx="279.8" cy="141.8" r="0.7"/><circle cx="261.8" cy="346.4" r="0.7"/><circle cx="208.5" cy="301" r="0.9"/><circle cx="41.1" cy="342.1" r="0.7"/><circle cx="343.5" cy="346.8" r="0.9"/><circle cx="326.7" cy="108.9" r="0.8"/><circle cx="268.9" cy="50.5" r="0.9"/><circle cx="303.8" cy="202.2" r="1.4"/><circle cx="273.2" cy="280.3" r="0.8"/><circle cx="38.6" cy="45.4" r="0.8"/><circle cx="181.2" cy="63" r="1"/><circle cx="237.8" cy="137.2" r="0.8"/><circle cx="331.8" cy="202.7" r="0.8"/><circle cx="44.4" cy="34.6" r="0.9"/><circle cx="279.3" cy="156.8" r="0.7"/><circle cx="10.2" cy="313" r="1.1"/><circle cx="366" cy="253.5" r="1.7"/><circle cx="7.3" cy="391.5" r="0.9"/><circle cx="309.8" cy="305.5" r="0.8"/><circle cx="378.9" cy="261" r="0.8"/><circle cx="264.8" cy="173.5" r="0.7"/><circle cx="374.8" cy="223.6" r="1.5"/><circle cx="6.4" cy="247.4" r="0.9"/></g>
+<g stroke-width="1" opacity=".3"><line x1="200" y1="68.6" x2="150.6" y2="88.5" stroke="#bf00ff"/><line x1="200" y1="68.6" x2="206.1" y2="128.7" stroke="#00f5ff"/><line x1="200" y1="68.6" x2="274.9" y2="114.3" stroke="#bf00ff"/><line x1="200" y1="68.6" x2="76.2" y2="140.3" stroke="#00f5ff"/><line x1="200" y1="68.6" x2="288.8" y2="168.6" stroke="#bf00ff"/><line x1="200" y1="68.6" x2="155.4" y2="175.2" stroke="#00f5ff"/><line x1="200" y1="68.6" x2="155.1" y2="200" stroke="#bf00ff"/><line x1="150.6" y1="88.5" x2="206.1" y2="128.7" stroke="#bf00ff"/><line x1="150.6" y1="88.5" x2="274.9" y2="114.3" stroke="#00f5ff"/><line x1="150.6" y1="88.5" x2="76.2" y2="140.3" stroke="#bf00ff"/><line x1="150.6" y1="88.5" x2="155.4" y2="175.2" stroke="#bf00ff"/><line x1="150.6" y1="88.5" x2="65.2" y2="243.5" stroke="#00f5ff"/><line x1="206.1" y1="128.7" x2="274.9" y2="114.3" stroke="#bf00ff"/><line x1="206.1" y1="128.7" x2="76.2" y2="140.3" stroke="#00f5ff"/><line x1="206.1" y1="128.7" x2="288.8" y2="168.6" stroke="#bf00ff"/><line x1="206.1" y1="128.7" x2="155.1" y2="200" stroke="#bf00ff"/><line x1="206.1" y1="128.7" x2="240.5" y2="245.3" stroke="#00f5ff"/><line x1="274.9" y1="114.3" x2="288.8" y2="168.6" stroke="#00f5ff"/><line x1="274.9" y1="114.3" x2="155.4" y2="175.2" stroke="#bf00ff"/><line x1="274.9" y1="114.3" x2="338.4" y2="221.3" stroke="#bf00ff"/><line x1="274.9" y1="114.3" x2="243.5" y2="301.2" stroke="#00f5ff"/><line x1="76.2" y1="140.3" x2="155.1" y2="200" stroke="#bf00ff"/><line x1="76.2" y1="140.3" x2="65.2" y2="243.5" stroke="#bf00ff"/><line x1="76.2" y1="140.3" x2="126.9" y2="286.2" stroke="#00f5ff"/><line x1="288.8" y1="168.6" x2="155.1" y2="200" stroke="#00f5ff"/><line x1="288.8" y1="168.6" x2="338.4" y2="221.3" stroke="#bf00ff"/><line x1="288.8" y1="168.6" x2="240.5" y2="245.3" stroke="#bf00ff"/><line x1="288.8" y1="168.6" x2="263.1" y2="307.4" stroke="#00f5ff"/><line x1="155.4" y1="175.2" x2="338.4" y2="221.3" stroke="#00f5ff"/><line x1="155.4" y1="175.2" x2="65.2" y2="243.5" stroke="#bf00ff"/><line x1="155.4" y1="175.2" x2="243.5" y2="301.2" stroke="#bf00ff"/><line x1="155.1" y1="200" x2="65.2" y2="243.5" stroke="#00f5ff"/><line x1="155.1" y1="200" x2="240.5" y2="245.3" stroke="#bf00ff"/><line x1="155.1" y1="200" x2="126.9" y2="286.2" stroke="#bf00ff"/><line x1="155.1" y1="200" x2="200" y2="324.5" stroke="#bf00ff"/><line x1="338.4" y1="221.3" x2="240.5" y2="245.3" stroke="#00f5ff"/><line x1="338.4" y1="221.3" x2="243.5" y2="301.2" stroke="#bf00ff"/><line x1="338.4" y1="221.3" x2="263.1" y2="307.4" stroke="#bf00ff"/><line x1="338.4" y1="221.3" x2="200" y2="324.5" stroke="#00f5ff"/><line x1="65.2" y1="243.5" x2="243.5" y2="301.2" stroke="#00f5ff"/><line x1="65.2" y1="243.5" x2="126.9" y2="286.2" stroke="#bf00ff"/><line x1="65.2" y1="243.5" x2="200" y2="324.5" stroke="#bf00ff"/><line x1="240.5" y1="245.3" x2="126.9" y2="286.2" stroke="#00f5ff"/><line x1="240.5" y1="245.3" x2="263.1" y2="307.4" stroke="#bf00ff"/><line x1="240.5" y1="245.3" x2="200" y2="324.5" stroke="#00f5ff"/><line x1="243.5" y1="301.2" x2="263.1" y2="307.4" stroke="#00f5ff"/><line x1="243.5" y1="301.2" x2="200" y2="324.5" stroke="#bf00ff"/><line x1="126.9" y1="286.2" x2="263.1" y2="307.4" stroke="#bf00ff"/><line x1="126.9" y1="286.2" x2="200" y2="324.5" stroke="#00f5ff"/><line x1="263.1" y1="307.4" x2="200" y2="324.5" stroke="#bf00ff"/></g>
+<g><g opacity="0.7"><circle cx="240.5" cy="245.3" r="10.9" fill="#00f5ff" opacity=".12"/><circle cx="240.5" cy="245.3" r="5.2" fill="url(#mol-c)"/></g><g opacity="0.7"><circle cx="155.1" cy="200" r="10.9" fill="#bf00ff" opacity=".12"/><circle cx="155.1" cy="200" r="5.2" fill="url(#mol-p)"/></g><g opacity="0.7"><circle cx="206.1" cy="128.7" r="11.4" fill="#00f5ff" opacity=".12"/><circle cx="206.1" cy="128.7" r="5.5" fill="url(#mol-c)"/></g><g opacity="0.7"><circle cx="288.8" cy="168.6" r="11.8" fill="#bf00ff" opacity=".12"/><circle cx="288.8" cy="168.6" r="5.7" fill="url(#mol-p)"/></g><g opacity="0.7"><circle cx="126.9" cy="286.2" r="12.2" fill="#00f5ff" opacity=".12"/><circle cx="126.9" cy="286.2" r="5.9" fill="url(#mol-c)"/></g><g opacity="0.8"><circle cx="76.2" cy="140.3" r="12.8" fill="#00f5ff" opacity=".12"/><circle cx="76.2" cy="140.3" r="6.2" fill="url(#mol-c)"/></g><g opacity="0.8"><circle cx="263.1" cy="307.4" r="13.1" fill="#bf00ff" opacity=".12"/><circle cx="263.1" cy="307.4" r="6.3" fill="url(#mol-p)"/></g><g opacity="0.8"><circle cx="200" cy="68.6" r="13.5" fill="#00f5ff" opacity=".12"/><circle cx="200" cy="68.6" r="6.5" fill="url(#mol-c)"/></g><g opacity="0.8"><circle cx="200" cy="324.5" r="13.5" fill="#00f5ff" opacity=".12"/><circle cx="200" cy="324.5" r="6.5" fill="url(#mol-c)"/></g><g opacity="0.9"><circle cx="150.6" cy="88.5" r="14.8" fill="#bf00ff" opacity=".12"/><circle cx="150.6" cy="88.5" r="7.1" fill="url(#mol-p)"/></g><g opacity="0.9"><circle cx="338.4" cy="221.3" r="15" fill="#00f5ff" opacity=".12"/><circle cx="338.4" cy="221.3" r="7.2" fill="url(#mol-c)"/></g><g opacity="0.9"><circle cx="65.2" cy="243.5" r="15.1" fill="#bf00ff" opacity=".12"/><circle cx="65.2" cy="243.5" r="7.3" fill="url(#mol-p)"/></g><g opacity="0.9"><circle cx="274.9" cy="114.3" r="16.4" fill="#bf00ff" opacity=".12"/><circle cx="274.9" cy="114.3" r="7.9" fill="url(#mol-p)"/></g><g opacity="0.9"><circle cx="243.5" cy="301.2" r="17.6" fill="#bf00ff" opacity=".12"/><circle cx="243.5" cy="301.2" r="8.5" fill="url(#mol-p)"/></g><g opacity="1"><circle cx="155.4" cy="175.2" r="18.5" fill="#00f5ff" opacity=".12"/><circle cx="155.4" cy="175.2" r="8.9" fill="url(#mol-c)"/></g></g>
+</svg>
+
+  <!-- Text -->
+  <g font-family="Inter, 'Segoe UI', Arial, sans-serif">
+    <text x="80" y="160" font-size="20" font-weight="600" fill="#00f5ff" letter-spacing="6">DATA ANALYST · MALTA</text>
+    <text x="76" y="282" font-family="'Space Grotesk', 'Segoe UI', Arial, sans-serif" font-size="104" font-weight="700" fill="#ffffff" letter-spacing="-3">Viktor</text>
+    <text x="76" y="384" font-family="'Space Grotesk', 'Segoe UI', Arial, sans-serif" font-size="104" font-weight="700" fill="#ffffff" letter-spacing="-3">Paunovic</text>
+    <rect x="80" y="414" width="160" height="5" rx="2.5" fill="url(#rule)"/>
+    <text x="80" y="470" font-size="26" fill="#c4c4dc">iGaming analytics · SQL · Python · Tableau · Power BI</text>
+    <!-- location pin -->
+    <g transform="translate(80,535)" fill="none" stroke="#00f5ff" stroke-width="2">
+      <path d="M10 24s-9-5-9-13.3A9 9 0 0 1 10 1.6a9 9 0 0 1 9 9.1C19 19 10 24 10 24z"/><circle cx="10" cy="10.5" r="3.2"/>
     </g>
-    <g>
-      <circle cx="-100" cy="-90" r="10" fill="#00f5ff" filter="url(#blur)" opacity="0.6"/>
-      <circle cx="-100" cy="-90" r="6" fill="#00f5ff"/>
-      <circle cx="100" cy="-90" r="10" fill="#bf00ff" filter="url(#blur)" opacity="0.6"/>
-      <circle cx="100" cy="-90" r="6" fill="#bf00ff"/>
-      <circle cx="0" cy="0" r="12" fill="#00f5ff" filter="url(#blur)" opacity="0.7"/>
-      <circle cx="0" cy="0" r="7" fill="#00f5ff"/>
-      <circle cx="-110" cy="80" r="10" fill="#bf00ff" filter="url(#blur)" opacity="0.6"/>
-      <circle cx="-110" cy="80" r="6" fill="#bf00ff"/>
-      <circle cx="110" cy="80" r="10" fill="#00f5ff" filter="url(#blur)" opacity="0.6"/>
-      <circle cx="110" cy="80" r="6" fill="#00f5ff"/>
-      <circle cx="0" cy="130" r="10" fill="#00ff88" filter="url(#blur)" opacity="0.6"/>
-      <circle cx="0" cy="130" r="6" fill="#00ff88"/>
-    </g>
-  </g>
-
-  <!-- Text content (left) -->
-  <text x="80" y="155" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600" fill="#00f5ff" letter-spacing="6">DATA ANALYST · MALTA</text>
-
-  <text x="80" y="280" font-family="'Space Grotesk', Arial, sans-serif" font-size="100" font-weight="700" fill="#ffffff" letter-spacing="-3">Viktor</text>
-  <text x="80" y="380" font-family="'Space Grotesk', Arial, sans-serif" font-size="100" font-weight="700" fill="#ffffff" letter-spacing="-3">Paunovic</text>
-
-  <!-- Gradient rule -->
-  <rect x="80" y="410" width="160" height="5" rx="2.5" fill="url(#grad)"/>
-
-  <!-- Tagline -->
-  <text x="80" y="465" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="400" fill="#a5a5c0">iGaming Analytics · SQL · Python · Tableau · Power BI</text>
-
-  <!-- Bottom row: stats / links -->
-  <g font-family="Inter, Arial, sans-serif">
-    <text x="80" y="555" font-size="18" font-weight="500" fill="#00f5ff">📍 Malta</text>
-    <text x="200" y="555" font-size="18" font-weight="500" fill="#a5a5c0">·</text>
-    <text x="220" y="555" font-size="18" font-weight="500" fill="#a5a5c0">viktorpaunovic.com</text>
-    <text x="80" y="590" font-size="14" font-weight="400" fill="#666680">Open to work · Junior Data Analyst · iGaming Industry</text>
+    <text x="110" y="555" font-size="20" font-weight="500" fill="#00f5ff">Malta</text>
+    <text x="178" y="555" font-size="20" fill="#8a8aa8">·</text>
+    <text x="198" y="555" font-size="20" font-weight="500" fill="#c4c4dc">viktorpaunovic.com</text>
+    <text x="80" y="592" font-size="17" fill="#9a9ab8">Open to work · iGaming Data Analyst</text>
   </g>
 </svg>
