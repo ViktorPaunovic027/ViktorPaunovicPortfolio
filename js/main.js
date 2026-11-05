@@ -306,10 +306,11 @@ function buildMolecule() {
 /* ── LOADER: READY, THEN LEAVE ────────────── */
 // The head script chooses `intro-play` (entering the site) or `intro-skip` (reload, arrival from another page of
 // the site, reduced motion, or the failsafe already showed the page).
-// The loader leaves as soon as the page is ready: the DOM is parsed (this script is deferred), the web fonts have
-// loaded, and the window `load` event has fired. No timer holds it. The only floor is the short identity reveal,
-// so the screen never flashes, and READY_CAP stops a slow asset from holding it longer.
-const READY_CAP = 4000;
+// The loader leaves once the page is ready: the DOM is parsed (this script is deferred), the web fonts have
+// loaded, the window `load` event has fired and the identity reveal has finished. It also stays until MIN_SHOW ms
+// after the visit started, so there is time to see it on a fast connection. READY_CAP stops a slow asset from
+// holding it longer.
+const MIN_SHOW = 2000, READY_CAP = 4000;
 function playIntro() {
   window.__mainRan = true; // tells the head failsafe that the intro is handled from here
   const loader = $('#loader'); if (!loader) { finishIntro(); return; }
@@ -319,8 +320,10 @@ function playIntro() {
   const fonts = document.fonts ? settle(document.fonts.ready) : null;
   const loaded = document.readyState === 'complete' ? null : new Promise(r => window.addEventListener('load', r, { once: true }));
   const prog = $('.l-progress'), reveal = prog && prog.getAnimations ? Promise.all(prog.getAnimations().map(a => settle(a.finished))) : null;
+  // performance.now() counts from the start of the navigation, so a late script doesn't add to the wait
+  const minShow = new Promise(r => setTimeout(r, Math.max(0, MIN_SHOW - performance.now())));
   const cap = new Promise(r => setTimeout(r, READY_CAP));
-  Promise.race([Promise.all([fonts, loaded, reveal, net && net.shown]), cap]).then(ready);
+  Promise.race([Promise.all([fonts, loaded, reveal, net && net.shown, minShow]), cap]).then(ready);
   setTimeout(finishIntro, READY_CAP + 3000); // last resort: never leave the page covered
 
   let leaving = false;

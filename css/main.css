@@ -61,6 +61,10 @@ html.has-cursor,html.has-cursor body{cursor:none;}
 .is-ready .l-bar::before{opacity:0;transition:opacity .15s ease;}
 .is-ready .l-bar::after{opacity:1;transform:none;}
 .l-status{font-size:.8rem;line-height:1.2;letter-spacing:.05em;color:var(--muted);}
+/* "Loading data..." — the dots appear one after another. They always take up space, so the text stays centred. */
+.l-dots i{font-style:normal;opacity:0;animation:lDots 1.4s ease-in-out infinite;}
+.l-dots i:nth-child(2){animation-delay:.2s;}.l-dots i:nth-child(3){animation-delay:.4s;}
+@keyframes lDots{0%,15%{opacity:0;}35%,80%{opacity:1;}100%{opacity:0;}}
 /* Identity reveal: a short fade and rise, one line after another. js/main.js waits for .l-progress to finish. */
 .l-name,.l-role,.l-progress{animation:lRise .5s cubic-bezier(.2,.7,.2,1) backwards;}
 .l-name{animation-delay:.06s;}.l-role{animation-delay:.13s;}.l-progress{animation-delay:.2s;}
@@ -434,5 +438,5 @@ footer{padding:2rem var(--gutter) 6.5rem;text-align:center;font-size:.8rem;color
   .js .fade-in,.js .stagger>*{opacity:1;transform:none;}
   .type-cursor{display:none;}
   /* The loader is skipped for these visitors; if it ever shows, the bar is static. */
-  .l-bar::before{display:none;}.l-bar::after{opacity:.5;transform:none;}
+  .l-bar::before{display:none;}.l-bar::after{opacity:.5;transform:none;}.l-dots i{animation:none;opacity:1;}
 }
