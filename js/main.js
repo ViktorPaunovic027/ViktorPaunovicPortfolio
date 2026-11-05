@@ -5,6 +5,8 @@ const $ = s => document.querySelector(s);
 function safe(fn) { try { fn(); } catch (e) { console.error(e); } }
 const ROOT = document.documentElement;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// True while the loader's opaque backdrop hides the page: background animations can wait until it starts to fade.
+let introCovers = ROOT.classList.contains('intro-play');
 const IS_TOUCH = matchMedia('(hover:none) and (pointer:coarse)').matches || 'ontouchstart' in window;
 
 /* ── HELPERS ──────────────────────────────── */
@@ -43,64 +45,172 @@ function molGeometry() {
   return { nodes, dust, bonds };
 }
 
-/* ── LOADER DASHBOARD BG ──────────────────── */
-function initLoaderBg() {
-  const dc = $('#dash-canvas'); if (!dc) return;
-  const cx = dc.getContext('2d');
-  let W = 0, H = 0;
-  function resize() { W = innerWidth; H = innerHeight; fitCanvas(dc, cx, W, H); }
-  resize();
-  window.addEventListener('resize', () => { if (!dc.isConnected) return; resize(); init(); });
-  const rnd = (a, b) => a + Math.random() * (b - a), cl = (v, a, b) => Math.max(a, Math.min(b, v));
-  const TOP = 28; // chart lines and bars stay below this strip, which holds the label and value
-  function grid() { const C = 52; cx.lineWidth = 1; cx.strokeStyle = 'rgba(0,245,255,.028)'; for (let x = 0; x < W; x += C) { cx.beginPath(); cx.moveTo(x, 0); cx.lineTo(x, H); cx.stroke(); } for (let y = 0; y < H; y += C) { cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke(); } }
-  let scanY = 0; function scan() { const g = cx.createLinearGradient(0, scanY - 50, 0, scanY + 50); g.addColorStop(0, 'rgba(0,245,255,0)'); g.addColorStop(.5, 'rgba(0,245,255,.045)'); g.addColorStop(1, 'rgba(0,245,255,0)'); cx.fillStyle = g; cx.fillRect(0, scanY - 50, W, 100); scanY = (scanY + 1) % H; }
-  function brk(x, y, w, h, col, a) { const L = 14; cx.strokeStyle = `rgba(${col},${a})`; cx.lineWidth = 1.5; [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]].forEach(([bx, by, sx, sy]) => { cx.beginPath(); cx.moveTo(bx, by + sy * L); cx.lineTo(bx, by); cx.lineTo(bx + sx * L, by); cx.stroke(); }); }
-  function labels(p, value) {
-    const [r, g, b] = p.col;
-    cx.font = '600 11px Inter,system-ui,sans-serif';
-    cx.textAlign = 'left'; cx.fillStyle = `rgba(${r},${g},${b},.75)`; cx.fillText(p.label, p.x + 12, p.y + 20);
-    cx.textAlign = 'right'; cx.fillStyle = 'rgba(240,240,255,.6)'; cx.fillText(Math.round(value).toLocaleString('en-GB'), p.x + p.w - 12, p.y + 20);
-    cx.textAlign = 'left';
+/* ── LOADER NETWORK ───────────────────────── */
+// The loader's centrepiece: the hero molecule's network (molGeometry) on a canvas. It sways slowly in 3D, light
+// pulses travel along its bonds, and two thin orbits circle it. It uses the camera of #mol-sym and the 3D molecule
+// (fov 48°, z = 9, a 400-unit box), so at rest it lines up exactly with #hero-mol and can settle into it.
+// Returns { canvas, shown, fly(rect, ms), fadeOut(ms) }, or null if there is nothing to draw on.
+function initLoaderNet() {
+  const cv = $('#loader-net'), stage = $('.l-stage'), cx = cv && stage && cv.getContext('2d');
+  if (!cx) return null;
+  const TAU = Math.PI * 2, F = 1 / Math.tan(24 * Math.PI / 180), CAM = 9;
+  const { nodes, dust: cloud, bonds } = molGeometry();
+  const atRest = p => F / (CAM - p[2]);
+  const dust = cloud.filter(p => Math.abs(p[0] * atRest(p)) <= 1 && Math.abs(p[1] * atRest(p)) <= 1); // the specks the SVG shows
+  const adj = nodes.map(() => []); bonds.forEach(([i, j]) => { adj[i].push(j); adj[j].push(i); });
+  const CY = '0,245,255', PU = '191,0,255', tint = i => (i % 2 ? PU : CY);
+  const CORE = [[[0, '#e8ffff'], [.45, '#00f5ff'], [1, '#007a85']], [[0, '#f6e0ff'], [.45, '#bf00ff'], [1, '#5c0080']]]; // as in #mol-sym
+  // Orbits: circles tilted towards the viewer and rolled in the screen plane. w: speed of the light along it (rad/s).
+  const ORBITS = [{ r: 4.25, tilt: .34, roll: -.32, w: .42, c: CY, a: .22, th: 2.4 }, { r: 3.7, tilt: .5, roll: .46, w: -.3, c: PU, a: .13, th: 5.5 }];
+  const INTRO = .6; // seconds for the network to fade and grow in
+  const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+  const smooth = (a, b, v) => { const u = clamp01((v - a) / (b - a)); return u * u * (3 - 2 * u); };
+  const easeOut = u => 1 - Math.pow(1 - u, 3), easeInOut = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+
+  let W = 0, H = 0, home = null, painted = null;
+  const view = { x: 0, y: 0, s: 0, yaw: 0, pitch: 0 }; // where the 400-unit box sits on screen, and its rotation
+  function measure() {
+    W = innerWidth; H = innerHeight; fitCanvas(cv, cx, W, H); painted = null;
+    const r = stage.getBoundingClientRect(); home = { x: r.left + r.width / 2, y: r.top + r.height / 2, s: r.width };
   }
-  class SC {
-    constructor(c) { Object.assign(this, c); this.pts = []; this.off = 0; let v = rnd(.3, .7); for (let i = 0; i < 70; i++) { v = cl(v + rnd(-.07, .07), .05, .95); this.pts.push(v); } }
-    update(dt) { this.off += this.spd * dt * 60; if (this.off >= 1) { this.off -= 1; let l = this.pts[this.pts.length - 1]; l = cl(l + rnd(-.07, .07), .05, .95); this.pts.push(l); if (this.pts.length > 80) this.pts.shift(); } }
-    draw() {
-      const [r, g, b] = this.col, S = 42, step = this.w / S, sl = this.pts.slice(-S), ph = this.h - TOP, base = this.y + this.h;
-      cx.beginPath(); sl.forEach((p, i) => { const px = this.x + (i - this.off) * step, py = base - p * ph; i === 0 && cx.moveTo(px, base); cx.lineTo(px, py); }); cx.lineTo(this.x + (sl.length - 1 - this.off) * step, base); cx.closePath();
-      const ga = cx.createLinearGradient(this.x, this.y + TOP, this.x, base); ga.addColorStop(0, `rgba(${r},${g},${b},.13)`); ga.addColorStop(1, `rgba(${r},${g},${b},0)`); cx.fillStyle = ga; cx.fill();
-      cx.beginPath(); cx.strokeStyle = `rgba(${r},${g},${b},.6)`; cx.lineWidth = 1.5; sl.forEach((p, i) => { const px = this.x + (i - this.off) * step, py = base - p * ph; i === 0 ? cx.moveTo(px, py) : cx.lineTo(px, py); }); cx.stroke();
-      brk(this.x, this.y, this.w, this.h, `${r},${g},${b}`, .35);
-      labels(this, sl[sl.length - 1] * 1000);
+  measure();
+  const onResize = () => { if (cv.isConnected) measure(); };
+  window.addEventListener('resize', onResize);
+
+  // Yaw about y, then pitch about x (the 3D molecule's order), then perspective. k = px per unit at that depth.
+  let cosY = 1, sinY = 0, cosP = 1, sinP = 0;
+  const turn = p => { const x = p[0] * cosY + p[2] * sinY, z = p[2] * cosY - p[0] * sinY; return [x, p[1] * cosP - z * sinP, p[1] * sinP + z * cosP]; };
+  const put = q => { const k = F / (CAM - q[2]) * view.s / 2; return { x: view.x + q[0] * k, y: view.y - q[1] * k, k, z: q[2] }; };
+
+  const pulses = [], ripples = [], ping = new Float32Array(nodes.length);
+  // t: animation time (frame steps capped at 50 ms, so nothing jumps after a stall). born: first frame, wall clock.
+  let t = 0, last = 0, born = 0, nextPulse = .8, fly = null, fade = null, revealed;
+  const shown = new Promise(r => { revealed = r; });
+  function spawn(from, prev, hop) {
+    const next = adj[from].filter(n => n !== prev); if (!next.length) return;
+    pulses.push({ a: from, b: next[(Math.random() * next.length) | 0], p: 0, d: 1.1 + Math.random() * .6, hop, c: Math.random() < .2 ? PU : CY });
+  }
+  function step(dt) {
+    t += dt;
+    const calm = fly || fade;
+    if (!calm && t > nextPulse && pulses.length < 3) { spawn((Math.random() * nodes.length) | 0, -1, 0); nextPulse = t + .7 + Math.random() * 1.4; }
+    for (let i = pulses.length - 1; i >= 0; i--) {
+      const q = pulses[i]; q.p += dt / q.d; if (q.p < 1) continue;
+      pulses.splice(i, 1); ping[q.b] = 1;
+      // A pulse often hands on to a neighbour; a chain that ends sends out a small ripple.
+      if (!calm && q.hop < 3 && Math.random() < .6) spawn(q.b, q.a, q.hop + 1); else if (q.hop > 0) ripples.push({ n: q.b, p: 0 });
     }
+    for (let i = 0; i < ping.length; i++) ping[i] = Math.max(0, ping[i] - dt / .9);
+    for (let i = ripples.length - 1; i >= 0; i--) if ((ripples[i].p += dt / 1.4) >= 1) ripples.splice(i, 1);
   }
-  class BC {
-    constructor(c) { Object.assign(this, c); this.vals = Array.from({ length: 8 }, () => rnd(.2, .9)); this.tgts = [...this.vals]; this.tmr = 0; }
-    update(dt) { this.vals = this.vals.map((v, i) => v + (this.tgts[i] - v) * .06); this.tmr += dt; if (this.tmr > 2.2) { this.tmr = 0; this.tgts = Array.from({ length: 8 }, () => rnd(.1, .95)); } }
-    draw() {
-      const [r, g, b] = this.col, gap = 3, bw = (this.w - gap * (this.vals.length - 1)) / this.vals.length, ph = this.h - TOP, base = this.y + this.h;
-      this.vals.forEach((v, i) => { const bx = this.x + i * (bw + gap), bh = v * ph, by = base - bh; cx.fillStyle = `rgba(${r},${g},${b},.07)`; cx.fillRect(bx, this.y + TOP, bw, ph); const gb = cx.createLinearGradient(bx, by, bx, base); gb.addColorStop(0, `rgba(${r},${g},${b},.55)`); gb.addColorStop(1, `rgba(${r},${g},${b},.08)`); cx.fillStyle = gb; cx.fillRect(bx, by, bw, bh); });
-      brk(this.x, this.y, this.w, this.h, `${r},${g},${b}`, .3);
-      labels(this, this.vals.reduce((a, v) => a + v, 0) * 100);
+
+  function orbit(o, front, al) {
+    const ct = Math.cos(o.tilt), st = Math.sin(o.tilt), cr = Math.cos(o.roll), sr = Math.sin(o.roll), zr = o.r * ct;
+    const at = th => { const c = Math.cos(th) * o.r, s = Math.sin(th) * o.r; return put([c * cr + s * st * sr, c * sr - s * st * cr, s * ct]); };
+    const span = REDUCED ? TAU : TAU * easeOut(clamp01((t - .1) / 1.6)), N = 72; // the line draws itself in
+    cx.lineWidth = .9; cx.strokeStyle = cx.fillStyle = `rgb(${o.c})`;
+    let p0 = at(o.th);
+    for (let k = 1; k <= N; k++) {
+      const p1 = at(o.th + span * k / N), z = (p0.z + p1.z) / 2;
+      if ((z > 0) === front) { cx.globalAlpha = al * o.a * (.3 + .7 * smooth(-zr, zr, z)); cx.beginPath(); cx.moveTo(p0.x, p0.y); cx.lineTo(p1.x, p1.y); cx.stroke(); }
+      p0 = p1;
     }
+    if (REDUCED) return;
+    // A light travelling along the orbit, with a fading tail. Drawn with the half of the orbit its head is on.
+    const head = o.th + o.w * t, dir = Math.sign(o.w), hp = at(head), on = al * smooth(1.2, 1.8, t);
+    if ((hp.z > 0) !== front || on < .01) return;
+    cx.lineWidth = 1.2; p0 = at(head - dir * .9);
+    for (let k = 1; k <= 14; k++) { const p1 = at(head - dir * .9 * (1 - k / 14)); cx.globalAlpha = on * .8 * (k / 14) ** 2 * (.4 + .6 * smooth(-zr, zr, p1.z)); cx.beginPath(); cx.moveTo(p0.x, p0.y); cx.lineTo(p1.x, p1.y); cx.stroke(); p0 = p1; }
+    cx.globalAlpha = on * (.55 + .45 * smooth(-zr, zr, hp.z)); cx.beginPath(); cx.arc(hp.x, hp.y, 1.5, 0, TAU); cx.fill();
   }
-  let charts, bars;
-  function init() {
-    const M = 28, CW = Math.min(W * .21, 230), CH = Math.min(H * .21, 148), BW = Math.min(W * .15, 170), BH = Math.min(H * .17, 120);
-    charts = [new SC({ x: M, y: H * .10, w: CW, h: CH, col: [0, 245, 255], label: 'SESSIONS', spd: .45 }), new SC({ x: W - M - CW, y: H * .10, w: CW, h: CH, col: [191, 0, 255], label: 'REVENUE', spd: .30 }), new SC({ x: M, y: H * .63, w: CW, h: CH, col: [0, 245, 255], label: 'EVENTS', spd: .55 }), new SC({ x: W - M - CW, y: H * .63, w: CW, h: CH, col: [0, 255, 136], label: 'USERS', spd: .38 })];
-    bars = [new BC({ x: M, y: H * .40, w: BW, h: BH, col: [0, 245, 255], label: 'DEPOSITS' }), new BC({ x: W - M - BW, y: H * .40, w: BW, h: BH, col: [191, 0, 255], label: 'FTDS' })];
+
+  // a: overall opacity. extra: orbits, pulses and ripples. hero: 0 while idle, 1 when the style matches #mol-sym
+  // exactly (it rises as the network lands, so the hand-over to the SVG is invisible). While idle the purple is quieter.
+  function draw(a, extra, hero) {
+    // Clear only what was painted last frame plus what will be painted now.
+    const h = view.s / 2, m = h * 1.5 + 16, box = [view.x - m, view.y - m, view.x + m, view.y + m];
+    const c = painted ? [Math.min(painted[0], box[0]), Math.min(painted[1], box[1]), Math.max(painted[2], box[2]), Math.max(painted[3], box[3])] : [0, 0, W, H];
+    cx.clearRect(c[0], c[1], c[2] - c[0], c[3] - c[1]); painted = box;
+    if (a < .005) return;
+    cosY = Math.cos(view.yaw); sinY = Math.sin(view.yaw); cosP = Math.cos(view.pitch); sinP = Math.sin(view.pitch);
+    const P = nodes.map(n => put(turn(n))), sc = Math.max(.7, Math.min(1.3, h / 140)), mix = (v, svg) => v + (svg - v) * hero;
+    if (extra > .005) ORBITS.forEach(o => orbit(o, false, a * extra));
+    // Dust: the SVG's specks, fading out towards the edge of the box (all of them, at .4, once it matches the SVG).
+    cx.fillStyle = `rgb(${CY})`;
+    for (const d of dust) {
+      const q = put(turn(d)), r = Math.hypot(q.x - view.x, q.y - view.y) / h; if (r > 1.2 + .3 * hero) continue;
+      const al = a * mix(.3 * (1 - smooth(.8, 1.15, r)) * (.45 + .55 * smooth(-4.5, 4.5, q.z)), .4); if (al < .01) continue;
+      cx.globalAlpha = al; cx.beginPath(); cx.arc(q.x, q.y, Math.max(.6, .0175 * q.k), 0, TAU); cx.fill();
+    }
+    // Bonds: one unit wide like the SVG (never under .8px); nearer ones brighter, the purple ones quieter.
+    cx.lineWidth = Math.max(.8, h / 200);
+    for (const [i, j] of bonds) {
+      const A = P[i], B = P[j], d = smooth(-3.2, 3.2, (A.z + B.z) / 2), pu = (i + j) % 2;
+      cx.globalAlpha = a * mix(pu ? .07 + .13 * d : .1 + .2 * d, .3); cx.strokeStyle = `rgb(${pu ? PU : CY})`;
+      cx.beginPath(); cx.moveTo(A.x, A.y); cx.lineTo(B.x, B.y); cx.stroke();
+    }
+    // Pulses: a bright head with a short tail, eased along the bond in 3D so they turn with the network.
+    for (const q of pulses) {
+      const al = a * extra * smooth(0, .12, q.p) * (1 - smooth(.88, 1, q.p)); if (al < .01) continue;
+      const A = nodes[q.a], B = nodes[q.b];
+      const at = s => { const e = s <= 0 ? 0 : s >= 1 ? 1 : (1 - Math.cos(Math.PI * s)) / 2; return put(turn([A[0] + (B[0] - A[0]) * e, A[1] + (B[1] - A[1]) * e, A[2] + (B[2] - A[2]) * e])); };
+      cx.lineWidth = 1.3 * sc; cx.strokeStyle = `rgb(${q.c})`;
+      let p0 = at(q.p - .2);
+      for (let k = 1; k <= 6; k++) { const p1 = at(q.p - .2 + .2 * k / 6); cx.globalAlpha = al * .75 * (k / 6) ** 2; cx.beginPath(); cx.moveTo(p0.x, p0.y); cx.lineTo(p1.x, p1.y); cx.stroke(); p0 = p1; }
+      const g = cx.createRadialGradient(p0.x, p0.y, 0, p0.x, p0.y, 7 * sc);
+      g.addColorStop(0, `rgba(${q.c},.5)`); g.addColorStop(1, `rgba(${q.c},0)`);
+      cx.globalAlpha = al; cx.fillStyle = g; cx.beginPath(); cx.arc(p0.x, p0.y, 7 * sc, 0, TAU); cx.fill();
+      cx.fillStyle = '#eaffff'; cx.beginPath(); cx.arc(p0.x, p0.y, 1.4 * sc, 0, TAU); cx.fill();
+    }
+    // Nodes, far to near: a soft halo (brighter for a moment when a pulse arrives) and the SVG's shaded core.
+    // The SVG's halo is a flat disc at .12; the soft one gives way to it as the network lands.
+    P.map((p, i) => i).sort((i, j) => P[i].z - P[j].z).forEach(i => {
+      const p = P[i], R = .13 * p.k, HR = .27 * p.k * (1.15 + .5 * ping[i]), op = a * (.7 + .3 * smooth(-3.2, 3.2, p.z)) * (i % 2 ? mix(.72, 1) : 1);
+      const g = cx.createRadialGradient(p.x, p.y, R * .5, p.x, p.y, HR);
+      g.addColorStop(0, `rgba(${tint(i)},${.16 + .3 * ping[i]})`); g.addColorStop(1, `rgba(${tint(i)},0)`);
+      cx.globalAlpha = op * (1 - hero); cx.fillStyle = g; cx.beginPath(); cx.arc(p.x, p.y, HR, 0, TAU); cx.fill();
+      if (hero > 0) { cx.globalAlpha = op * hero * .12; cx.fillStyle = `rgb(${tint(i)})`; cx.beginPath(); cx.arc(p.x, p.y, .27 * p.k, 0, TAU); cx.fill(); }
+      const gx = p.x - .24 * R, gy = p.y - .3 * R, cg = cx.createRadialGradient(gx, gy, 0, gx, gy, 1.4 * R);
+      CORE[i % 2].forEach(([o, col]) => cg.addColorStop(o, col));
+      cx.globalAlpha = op; cx.fillStyle = cg; cx.beginPath(); cx.arc(p.x, p.y, R, 0, TAU); cx.fill();
+    });
+    if (extra > .005) ORBITS.forEach(o => orbit(o, true, a * extra));
+    for (const r of ripples) {
+      const p = P[r.n]; cx.globalAlpha = a * extra * .4 * (1 - r.p) ** 2; cx.strokeStyle = `rgb(${tint(r.n)})`; cx.lineWidth = .8;
+      cx.beginPath(); cx.arc(p.x, p.y, .13 * p.k + (4 + 16 * easeOut(r.p)) * sc, 0, TAU); cx.stroke();
+    }
+    cx.globalAlpha = 1;
   }
-  init();
-  let last = 0;
-  function frame(ts) {
-    if (!dc.isConnected) return; // the loader has been removed
-    const dt = Math.min((ts - last) / 1000, .05); last = ts;
-    cx.clearRect(0, 0, W, H); grid(); scan();
-    charts.forEach(c => { c.update(dt); c.draw(); }); bars.forEach(b => { b.update(dt); b.draw(); });
+
+  function frame(now) {
+    if (!cv.isConnected) { window.removeEventListener('resize', onResize); return; } // the loader has been removed
+    const dt = Math.min((now - last) / 1000, .05); last = now;
+    if (REDUCED) t = INTRO; else step(dt);
+    // The fade-in runs on the wall clock, so slow first frames can't hold the loader up.
+    if (!born) born = now;
+    const age = (now - born) / 1000, intro = REDUCED ? 1 : easeOut(clamp01(age / INTRO)), amp = REDUCED ? 0 : smooth(0, 1.2, t);
+    let a = intro, extra = 1, hero = 0, finished = null;
+    if (fly) { // glide to the hero molecule while the sway eases back to the resting angle
+      const u = clamp01((now - fly.t0) / fly.ms), e = easeInOut(u);
+      for (const k in fly.to) view[k] = fly.from[k] + (fly.to[k] - fly.from[k]) * e;
+      extra = 1 - smooth(0, .4, u); hero = smooth(.35, 1, u); if (u >= 1) finished = fly;
+    } else {
+      view.x = home.x; view.y = home.y; view.s = home.s * (.92 + .08 * intro);
+      view.yaw = amp * .5 * Math.sin(TAU * t / 11); view.pitch = amp * .15 * Math.sin(TAU * t / 8 + .8);
+      if (fade) { const u = clamp01((now - fade.t0) / fade.ms); a *= 1 - easeOut(u); view.s *= 1 - .04 * u; if (u >= 1) finished = fade; }
+    }
+    draw(a, extra, hero);
+    if (age >= INTRO || REDUCED) revealed();
+    if (finished) { finished.res(); return; } // the last frame stays on the canvas
     requestAnimationFrame(frame);
   }
-  requestAnimationFrame(ts => { last = ts; frame(ts); });
+  requestAnimationFrame(now => { last = now; frame(now); });
+
+  return {
+    canvas: cv, shown,
+    fly: (rect, ms) => new Promise(res => { fly = { from: { ...view }, to: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, s: rect.width, yaw: 0, pitch: 0 }, t0: performance.now(), ms, res }; }),
+    fadeOut: ms => new Promise(res => { fade = { t0: performance.now(), ms, res }; })
+  };
 }
 
 /* ── PARTICLES ────────────────────────────── */
@@ -127,11 +237,11 @@ function initParticles() {
   }
   window.addEventListener('resize', resize);
   // The canvas is position:fixed, so it is always "visible" to an IntersectionObserver.
-  // Instead: stop while the tab is hidden, and run at ~30 fps once past the hero.
+  // Instead: stop while the tab is hidden or the loader covers the page, and run at ~30 fps once past the hero.
   let skip = false;
   function frame() {
     requestAnimationFrame(frame);
-    if (document.hidden) return;
+    if (document.hidden || introCovers) return;
     if (scrollY > innerHeight) { skip = !skip; if (skip) return; }
     move(); draw();
   }
@@ -180,8 +290,10 @@ function buildMolecule() {
   function loop() {
     requestAnimationFrame(loop);
     if (!visible || document.hidden) return;
-    t += .008; bY += .004; bX += .0014; smx += (mx - smx) * .04; smy += (my - smy) * .04;
-    grp.rotation.y = bY + smx * .45; grp.rotation.x = bX + smy * .3;
+    // Spin up from rest over ~3 s, so the 3D molecule lines up with the SVG while they cross-fade.
+    t += .008; const ramp = Math.min(1, t / 1.6), spin = ramp * ramp * (3 - 2 * ramp);
+    bY += .004 * spin; bX += .0014 * spin; smx += (mx - smx) * .04; smy += (my - smy) * .04;
+    grp.rotation.y = bY + smx * .45 * spin; grp.rotation.x = bX + smy * .3 * spin;
     cL.intensity = 2.4 + Math.sin(t * 1.7) * .9; pL.intensity = 2.4 + Math.cos(t * 1.3) * .9;
     ms.forEach((m, i) => { m.material.emissiveIntensity = .6 + Math.sin(t + i * .72) * .25; });
     R.render(scene, cam);
@@ -191,59 +303,69 @@ function buildMolecule() {
   window.addEventListener('resize', () => { const s = size(); R.setSize(s.w, s.h, false); cam.aspect = s.w / s.h; cam.updateProjectionMatrix(); });
 }
 
-/* ── LOADER TRANSITION ────────────────────── */
-// The head script decides between `intro-play` (first visit this session) and
-// `intro-skip` (repeat visit, reduced motion, or the failsafe already showed the page).
+/* ── LOADER: READY, THEN LEAVE ────────────── */
+// The head script chooses `intro-play` (entering the site) or `intro-skip` (reload, arrival from another page of
+// the site, reduced motion, or the failsafe already showed the page).
+// The loader leaves as soon as the page is ready: the DOM is parsed (this script is deferred), the web fonts have
+// loaded, and the window `load` event has fired. No timer holds it. The only floor is the short identity reveal,
+// so the screen never flashes, and READY_CAP stops a slow asset from holding it longer.
+const READY_CAP = 4000;
 function playIntro() {
   window.__mainRan = true; // tells the head failsafe that the intro is handled from here
-  safe(initLoaderBg);
-  const MIN = 1200, MAX_WAIT = 4000;
-  let pageReady = document.readyState === 'complete', timerDone = false, started = false;
-  const tryStart = () => { if (pageReady && timerDone) run(); };
-  setTimeout(() => { timerDone = true; tryStart(); }, MIN);
-  if (!pageReady) window.addEventListener('load', () => { pageReady = true; tryStart(); }, { once: true });
-  setTimeout(() => { pageReady = true; timerDone = true; tryStart(); }, MAX_WAIT); // never wait on a slow asset
+  const loader = $('#loader'); if (!loader) { finishIntro(); return; }
+  let net = null;
+  try { net = initLoaderNet(); } catch (e) { console.error(e); } // without the network the loader still works
+  const settle = p => Promise.resolve(p).catch(() => {});
+  const fonts = document.fonts ? settle(document.fonts.ready) : null;
+  const loaded = document.readyState === 'complete' ? null : new Promise(r => window.addEventListener('load', r, { once: true }));
+  const prog = $('.l-progress'), reveal = prog && prog.getAnimations ? Promise.all(prog.getAnimations().map(a => settle(a.finished))) : null;
+  const cap = new Promise(r => setTimeout(r, READY_CAP));
+  Promise.race([Promise.all([fonts, loaded, reveal, net && net.shown]), cap]).then(ready);
+  setTimeout(finishIntro, READY_CAP + 3000); // last resort: never leave the page covered
 
-  function run() {
-    if (started) return; started = true;
-    const loader = $('#loader'), fly = $('#loader-mol'), heroMol = $('#hero-mol'), page = $('#page-content');
-    if (!loader || !fly || !heroMol) { finishIntro(); return; }
-    const bar = $('.l-bar-fill'); if (bar) bar.classList.add('done');
-    const from = fly.getBoundingClientRect(), to = heroMol.getBoundingClientRect();
-    document.querySelectorAll('.l-ring').forEach(r => { r.style.transition = 'opacity .25s'; r.style.opacity = '0'; });
-    const texts = $('#loader-texts'); texts.style.transition = 'opacity .25s'; texts.style.opacity = '0';
-    // Lift the molecule out of the loader so it stays solid while the loader fades.
-    fly.style.cssText = `position:fixed;left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px;z-index:10001;pointer-events:none;will-change:transform;transform-origin:50% 50%;`;
-    document.body.appendChild(fly);
-    loader.style.pointerEvents = 'none';
-    // Fly into the hero only if the hero is on screen (not when the page opened at a #section,
-    // or the hero sits below the fold on a short landscape screen). Otherwise just fade out.
-    const heroOnScreen = to.width > 0 && to.bottom > 0 && to.top < innerHeight && to.right > 0 && to.left < innerWidth;
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (heroOnScreen) {
-        const dx = (to.left + to.width / 2) - (from.left + from.width / 2), dy = (to.top + to.height / 2) - (from.top + from.height / 2), sc = to.width / from.width;
-        fly.style.transition = 'transform .9s cubic-bezier(.4,0,.2,1)'; fly.style.transform = `translate(${dx}px,${dy}px) scale(${sc})`;
-      } else {
-        fly.style.transition = 'opacity .5s ease .2s'; fly.style.opacity = '0';
-      }
-      page.style.transition = 'opacity .7s ease .25s'; page.style.opacity = '1';
-      loader.style.transition = 'opacity .5s ease .45s'; loader.style.opacity = '0';
-    }));
+  let leaving = false;
+  function ready() {
+    if (leaving || window.__introDone) return; leaving = true;
+    const status = $('.l-status'); if (status) status.textContent = 'Ready'; // announced by the live region
+    loader.classList.add('is-ready');
+    setTimeout(leave, 160); // a beat for the completed bar to register
+  }
+  function leave() {
+    if (window.__introDone) return;
+    const page = $('#page-content'), heroMol = $('#hero-mol');
+    loader.classList.add('is-leaving'); // CSS fades the backdrop, charts and text
+    introCovers = false; // the page shows through from now on
+    if (page) { page.style.transition = 'opacity .6s ease .1s'; page.style.opacity = '1'; } // after the name has mostly gone
+    // Settle into the hero molecule only if it is on screen (not when the page opened at a #section, or the hero
+    // sits below the fold on a short landscape screen). Otherwise the network just fades.
+    const to = heroMol && heroMol.getBoundingClientRect();
+    const heroOnScreen = !!to && to.width > 0 && to.bottom > 0 && to.top < innerHeight && to.right > 0 && to.left < innerWidth;
     let done = false;
-    const end = () => { if (done) return; done = true; window.removeEventListener('resize', end); fly.remove(); finishIntro(); };
+    const end = () => { if (done) return; done = true; window.removeEventListener('resize', end); finishIntro(); };
     window.addEventListener('resize', end); // the measured target is stale after a resize: finish now
-    setTimeout(end, 950);
+    if (net && heroOnScreen && !REDUCED) {
+      net.fly(to, 800).then(() => {
+        // The canvas now matches #hero-mol exactly (place, size and angle): show the SVG beneath it, fade the canvas.
+        heroMol.style.visibility = 'visible';
+        net.canvas.style.transition = 'opacity .25s ease'; net.canvas.style.opacity = '0';
+        setTimeout(end, 260);
+      });
+    } else {
+      if (net) net.fadeOut(450);
+      setTimeout(end, 600);
+    }
+    setTimeout(end, 1600); // backstop, e.g. if the tab goes to the background and frames stop
   }
 }
 
 function finishIntro() {
   window.__mainRan = true;
   if (window.__introDone) return;
-  window.__introDone = true;
+  window.__introDone = true; introCovers = false;
   ROOT.classList.remove('intro-play'); ROOT.classList.add('intro-done');
   const loader = $('#loader'); if (loader) loader.remove();
-  const fly = $('#loader-mol'); if (fly) fly.remove();
-  const page = $('#page-content'); if (page) page.style.opacity = '';
+  const page = $('#page-content'); if (page) { page.style.opacity = ''; page.style.transition = ''; }
+  const heroMol = $('#hero-mol'); if (heroMol) heroMol.style.visibility = '';
   [initScrollObs, initNav, initExtras, initMolecule3D].forEach(safe);
 }
 

@@ -107,7 +107,9 @@
 (function(){
   var d=document.documentElement,seen=false,reduced=false;
   d.classList.add('js');
-  try{seen=sessionStorage.getItem('intro-seen')==='1';sessionStorage.setItem('intro-seen','1');}catch(e){}
+  try{seen=sessionStorage.getItem('intro-seen')==='1';sessionStorage.setItem('intro-seen','1');}
+  /* Storage blocked: at least skip the intro on a reload or a back/forward visit. */
+  catch(e){try{var n=performance.getEntriesByType('navigation')[0];if(n&&n.type!=='navigate')seen=true;}catch(_){}}
   /* Arriving from another page on this site (e.g. a case study) is not an entry to the site: skip the intro. */
   try{if(document.referrer&&new URL(document.referrer).origin===location.origin)seen=true;}catch(e){}
   try{reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
@@ -135,18 +137,24 @@
 <!-- Scroll progress bar -->
 <div id="scroll-progress"></div>
 
-<!-- LOADER -->
-<div id="loader" aria-hidden="true">
-  <canvas id="dash-canvas"></canvas>
-  <div id="loader-mol-wrap">
-    <div class="l-ring"></div><div class="l-ring"></div><div class="l-ring"></div>
-    <div id="loader-mol"><svg class="mol-svg" viewBox="0 0 400 400" focusable="false"><use href="#mol-sym"/></svg></div>
+<!-- LOADER: shown only when a visitor enters the site (see the script in <head>). Only the status line is
+     exposed to screen readers: the name repeats the page <h1>, and the charts are drawings with no data. -->
+<div id="loader">
+  <div class="l-bg" aria-hidden="true"></div>
+  <div class="l-charts" aria-hidden="true">
+    <svg class="l-chart l-chart--line" viewBox="0 0 184 108" focusable="false"><defs><linearGradient id="lc-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00f5ff" stop-opacity=".2"/><stop offset="1" stop-color="#00f5ff" stop-opacity="0"/></linearGradient><linearGradient id="lc-fade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".22" stop-color="#fff"/></linearGradient><mask id="lc-mask"><rect x="16" y="36" width="152" height="60" fill="url(#lc-fade)"/></mask></defs><rect class="l-card" x=".5" y=".5" width="183" height="107" rx="12"/><rect class="l-sk" x="16" y="16" width="46" height="5" rx="2.5"/><rect class="l-sk l-sk--2" x="16" y="27" width="28" height="4" rx="2"/><path class="l-grid" d="M16 50.5H168M16 68.5H168M16 86.5H168"/><g mask="url(#lc-mask)"><g class="l-scroll"><path d="M3.3 64.6c2.1-1.5 8.4-7.8 12.7-9c4.2-1.3 8.4 .1 12.7 1.5c4.2 1.4 8.4 5.8 12.7 7.1c4.2 1.3 8.4 1.6 12.7 .9c4.2-.6 8.4-4.1 12.7-4.8c4.2-.7 8.4-.9 12.7 .7c4.2 1.6 8.4 6.1 12.7 9.1c4.2 3 8.4 6.9 12.7 8.9c4.2 2 8.4 2.9 12.7 3.3c4.2 .4 8.4 .1 12.7-1c4.2-1.1 8.4-2.9 12.7-5.6c4.2-2.8 8.4-7.7 12.7-11c4.2-3.3 8.4-7.8 12.7-9c4.2-1.3 8.4 .1 12.7 1.5c4.2 1.4 8.4 5.8 12.7 7.1c4.2 1.3 8.4 1.6 12.7 .9c4.2-.6 8.4-4.1 12.7-4.8c4.2-.7 8.4-.9 12.7 .7c4.2 1.6 8.4 6.1 12.7 9.1c4.2 3 8.4 6.9 12.7 8.9c4.2 2 8.4 2.9 12.7 3.3c4.2 .4 8.4 .1 12.7-1c4.2-1.1 8.4-2.9 12.7-5.6c4.2-2.8 8.4-7.7 12.7-11c4.2-3.3 8.4-7.8 12.7-9c4.2-1.3 10.6 1.2 12.7 1.5V94H3.3Z" fill="url(#lc-area)"/><path class="l-line" d="M3.3 64.6c2.1-1.5 8.4-7.8 12.7-9c4.2-1.3 8.4 .1 12.7 1.5c4.2 1.4 8.4 5.8 12.7 7.1c4.2 1.3 8.4 1.6 12.7 .9c4.2-.6 8.4-4.1 12.7-4.8c4.2-.7 8.4-.9 12.7 .7c4.2 1.6 8.4 6.1 12.7 9.1c4.2 3 8.4 6.9 12.7 8.9c4.2 2 8.4 2.9 12.7 3.3c4.2 .4 8.4 .1 12.7-1c4.2-1.1 8.4-2.9 12.7-5.6c4.2-2.8 8.4-7.7 12.7-11c4.2-3.3 8.4-7.8 12.7-9c4.2-1.3 8.4 .1 12.7 1.5c4.2 1.4 8.4 5.8 12.7 7.1c4.2 1.3 8.4 1.6 12.7 .9c4.2-.6 8.4-4.1 12.7-4.8c4.2-.7 8.4-.9 12.7 .7c4.2 1.6 8.4 6.1 12.7 9.1c4.2 3 8.4 6.9 12.7 8.9c4.2 2 8.4 2.9 12.7 3.3c4.2 .4 8.4 .1 12.7-1c4.2-1.1 8.4-2.9 12.7-5.6c4.2-2.8 8.4-7.7 12.7-11c4.2-3.3 8.4-7.8 12.7-9c4.2-1.3 10.6 1.2 12.7 1.5"/></g></g></svg>
+    <svg class="l-chart l-chart--bars" viewBox="0 0 184 108" focusable="false"><defs><linearGradient id="lc-bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00f5ff" stop-opacity=".55"/><stop offset="1" stop-color="#00f5ff" stop-opacity=".08"/></linearGradient><linearGradient id="lc-bar2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bf00ff" stop-opacity=".55"/><stop offset="1" stop-color="#bf00ff" stop-opacity=".08"/></linearGradient></defs><rect class="l-card" x=".5" y=".5" width="183" height="107" rx="12"/><rect class="l-sk" x="16" y="16" width="46" height="5" rx="2.5"/><rect class="l-sk l-sk--2" x="16" y="27" width="28" height="4" rx="2"/><path class="l-axis" d="M16 94.5H168"/><rect class="l-b" x="16" y="73.5" width="10" height="20.5" rx="2" style="--lo:.7;--d:-0s"/><rect class="l-b" x="33.8" y="65.9" width="10" height="28.1" rx="2" style="--lo:.8;--d:-1.4s"/><rect class="l-b" x="51.5" y="69.2" width="10" height="24.8" rx="2" style="--lo:.8;--d:-2.7s"/><rect class="l-b" x="69.3" y="59.4" width="10" height="34.6" rx="2" style="--lo:.8;--d:-4.1s"/><rect class="l-b" x="87" y="62.7" width="10" height="31.3" rx="2" style="--lo:.8;--d:-1.3s"/><rect class="l-b" x="104.8" y="51.9" width="10" height="42.1" rx="2" style="--lo:.9;--d:-2.7s"/><rect class="l-b" x="122.5" y="56.2" width="10" height="37.8" rx="2" style="--lo:.7;--d:-4s"/><rect class="l-b l-b--accent" x="140.3" y="44.3" width="10" height="49.7" rx="2" style="--lo:.8;--d:-1.2s"/><rect class="l-b" x="158" y="49.7" width="10" height="44.3" rx="2" style="--lo:.8;--d:-2.6s"/></svg>
+    <svg class="l-chart l-chart--donut" viewBox="0 0 184 108" focusable="false"><rect class="l-card" x=".5" y=".5" width="183" height="107" rx="12"/><rect class="l-sk" x="16" y="16" width="46" height="5" rx="2.5"/><rect class="l-sk l-sk--2" x="16" y="27" width="28" height="4" rx="2"/><circle class="l-ring-in" cx="50" cy="66" r="13"/><g class="l-spin"><path class="l-arc l-arc--c" d="M50 45A21 21 0 1 1 44.8 86.3"/><path class="l-arc l-arc--p" d="M39.9 84.4A21 21 0 0 1 29 67.3"/><path class="l-arc l-arc--n" d="M29.4 62.1A21 21 0 0 1 44.8 45.7"/></g><circle class="l-key l-key--c" cx="98" cy="52" r="2.6"/><rect class="l-sk" x="106" y="50" width="44" height="4" rx="2"/><circle class="l-key l-key--p" cx="98" cy="66" r="2.6"/><rect class="l-sk" x="106" y="64" width="34" height="4" rx="2"/><circle class="l-key l-key--n" cx="98" cy="80" r="2.6"/><rect class="l-sk" x="106" y="78" width="24" height="4" rx="2"/></svg>
+    <svg class="l-chart l-chart--scatter" viewBox="0 0 184 108" focusable="false"><rect class="l-card" x=".5" y=".5" width="183" height="107" rx="12"/><rect class="l-sk" x="16" y="16" width="46" height="5" rx="2.5"/><rect class="l-sk l-sk--2" x="16" y="27" width="28" height="4" rx="2"/><path class="l-band" d="M18 77.8L36.5 75.2L55 72.1L73.5 68.3L92 63.9L110.5 58.8L129 53.2L147.5 46.9L166 39.9L166 56.4L147.5 58.8L129 61.9L110.5 65.6L92 69.9L73.5 74.8L55 80.4L36.5 86.5L18 93.3Z"/><path class="l-trend" d="M18 85.6L166 48.2"/><path class="l-trace" d="M18 85.6L166 48.2" pathLength="100"/><circle class="l-dot" cx="19.5" cy="86.3" r="1.9" style="--d:-0s"/><circle class="l-dot" cx="30.3" cy="77.8" r="1.9" style="--d:-.6s"/><circle class="l-dot" cx="42.2" cy="79.6" r="1.9" style="--d:-1.2s"/><circle class="l-dot" cx="49.7" cy="78.4" r="1.9" style="--d:-1.8s"/><circle class="l-dot" cx="58.7" cy="73.4" r="1.9" style="--d:-2.4s"/><circle class="l-dot" cx="66.6" cy="77.3" r="1.9" style="--d:-3.1s"/><circle class="l-dot" cx="75.4" cy="70.3" r="1.9" style="--d:-.1s"/><circle class="l-dot" cx="86.8" cy="73.4" r="1.9" style="--d:-.7s"/><circle class="l-dot" cx="95" cy="60.9" r="1.9" style="--d:-1.3s"/><circle class="l-dot" cx="103.4" cy="67.7" r="1.9" style="--d:-1.9s"/><circle class="l-dot" cx="114.5" cy="62.2" r="1.9" style="--d:-2.5s"/><circle class="l-dot" cx="123.1" cy="55.4" r="1.9" style="--d:-3.1s"/><circle class="l-dot" cx="131.4" cy="61" r="1.9" style="--d:-.1s"/><circle class="l-dot" cx="139.2" cy="50.5" r="1.9" style="--d:-.7s"/><circle class="l-dot" cx="151.2" cy="54.5" r="1.9" style="--d:-1.3s"/><circle class="l-dot" cx="157.6" cy="48.2" r="1.9" style="--d:-2s"/><circle class="l-dot l-dot--accent" cx="70" cy="50" r="2.2" style="--d:-2.6s"/><circle class="l-dot l-dot--accent" cx="140" cy="86" r="2.2" style="--d:-3.2s"/></svg>
   </div>
-  <div id="loader-texts">
-    <div class="l-name">Viktor Paunovic</div>
-    <div class="l-role">Data Analyst</div>
-    <div class="l-bar-wrap"><div class="l-bar-fill"></div></div>
+  <div class="l-center">
+    <div class="l-stage" aria-hidden="true"></div>
+    <div class="l-copy">
+      <div class="l-identity" aria-hidden="true"><p class="l-name">Viktor Paunovic</p><p class="l-role">Data Analyst</p></div>
+      <div class="l-progress"><div class="l-bar" aria-hidden="true"></div><p class="l-status" role="status">Loading portfolio</p></div>
+    </div>
   </div>
+  <canvas id="loader-net" aria-hidden="true"></canvas>
 </div>
 
 <!-- PAGE -->

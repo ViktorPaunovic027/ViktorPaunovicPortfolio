@@ -27,29 +27,83 @@ html.has-cursor,html.has-cursor body{cursor:none;}
 /* ── BG CANVASES ─────────────────────────── */
 #particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
-/* ── LOADER ──────────────────────────────── */
-/* Hidden by default: it only shows when the head script sets .intro-play (first visit this session, JS on). */
-#loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:none;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;}
-#dash-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;}
-#loader-mol-wrap{position:relative;z-index:2;width:min(50vmin,360px);height:min(50vmin,360px);flex-shrink:0;}
-#loader-texts{position:relative;z-index:2;margin-top:2.8rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.45rem;}
-.l-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,245,255,.35);pointer-events:none;animation:ringOut 2.4s ease-out infinite;}
-.l-ring:nth-child(1){inset:-16px;animation-delay:0s;}.l-ring:nth-child(2){inset:-36px;animation-delay:.8s;}.l-ring:nth-child(3){inset:-56px;animation-delay:1.6s;}
-@keyframes ringOut{0%{opacity:.7;transform:scale(.95);border-color:rgba(0,245,255,.4);}100%{opacity:0;transform:scale(1.12);border-color:rgba(191,0,255,0);}}
-.intro-play #loader{display:flex;}
-#loader-mol{position:absolute;inset:0;}
 .mol-svg{display:block;width:100%;height:100%;overflow:visible;}
-#loader-mol .mol-svg{animation:molFloat 3.2s ease-in-out infinite;}
-@keyframes molFloat{50%{transform:translateY(-6px) scale(1.02);}}
-.l-name{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.2rem,3vw,1.7rem);font-weight:700;color:#fff;letter-spacing:.06em;opacity:0;transform:translateY(10px);animation:fadeUp .6s ease .3s forwards;}
-.l-role{font-size:.8rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);opacity:0;transform:translateY(10px);animation:fadeUp .6s ease .55s forwards;}
-@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
-.l-bar-wrap{margin-top:1.4rem;width:140px;height:2px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;opacity:0;animation:fadeUp .3s ease .1s forwards;}
-/* Fills to 85% over the minimum loader time, then to 100% when the page is actually ready (.done). */
-.l-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--purple));box-shadow:0 0 8px var(--cyan);border-radius:1px;animation:barAnim 1.1s cubic-bezier(.4,0,.2,1) .1s forwards;}
-.l-bar-fill.done{animation:barDone .25s ease-out forwards;}
-@keyframes barAnim{from{width:0%;}to{width:85%;}}
-@keyframes barDone{from{width:85%;}to{width:100%;}}
+
+/* ── LOADER ──────────────────────────────── */
+/* Shown only while the head script's .intro-play class is set: entering the site in this tab, JS on, motion allowed.
+   Backdrop, charts, name and status are plain HTML/CSS, so they paint before js/main.js runs. The network
+   (#loader-net) is drawn by initLoaderNet() in js/main.js; playIntro() leaves as soon as the page is ready.
+   --S is the network's box: it shrinks with the screen so the whole composition always fits without scrolling. */
+#loader{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;overflow:hidden;--S:clamp(132px,min(30vh,56vw),280px);}
+@supports(height:1svh){#loader{--S:clamp(132px,min(30svh,56vw),280px);}}
+.intro-play #loader{display:flex;}
+#loader.is-leaving{pointer-events:none;}
+/* Deep charcoal, a very faint grid that fades towards the edges, and a soft vignette */
+.l-bg{position:absolute;inset:0;background:radial-gradient(120% 95% at 50% 44%,transparent 45%,rgba(0,0,0,.55)),#0b0c10;}
+.l-bg::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.032) 1px,transparent 1px) center/56px 56px,linear-gradient(90deg,rgba(255,255,255,.032) 1px,transparent 1px) center/56px 56px;-webkit-mask-image:radial-gradient(ellipse 72% 66% at 50% 44%,#000,rgba(0,0,0,.55) 38%,transparent 82%);mask-image:radial-gradient(ellipse 72% 66% at 50% 44%,#000,rgba(0,0,0,.55) 38%,transparent 82%);}
+.l-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:-4vh;}
+.l-stage{position:relative;width:var(--S);height:var(--S);flex-shrink:0;}
+/* Soft light behind the network */
+.l-stage::before{content:'';position:absolute;inset:-58%;background:radial-gradient(closest-side,rgba(0,245,255,.09),rgba(0,245,255,.032) 45%,transparent 76%),radial-gradient(closest-side at 58% 62%,rgba(191,0,255,.04),transparent 72%);pointer-events:none;}
+#loader-net{position:absolute;inset:0;z-index:3;pointer-events:none;}
+.l-copy{display:flex;flex-direction:column;align-items:center;margin-top:clamp(14px,3.6vh,36px);}
+.l-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(1.55rem,1.1rem + 1.8vw,2.4rem);line-height:1.1;letter-spacing:-.02em;color:#f4f6fb;}
+/* text-indent equals the letter-spacing, so the spaced word stays optically centred */
+.l-role{margin-top:.7rem;font-size:.8rem;font-weight:500;line-height:1;letter-spacing:.32em;text-indent:.32em;text-transform:uppercase;color:rgba(0,245,255,.8);}
+.l-progress{display:flex;flex-direction:column;align-items:center;gap:.75rem;margin-top:clamp(18px,4vh,34px);}
+/* Indeterminate: real progress can't be measured here, so a short light sweeps the track until the page is ready.
+   Then the sweep gives way to a full track for a moment before everything fades (.is-ready). */
+.l-bar{position:relative;width:clamp(112px,11vw,148px);height:2px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;}
+.l-bar::before,.l-bar::after{content:'';position:absolute;top:0;bottom:0;left:0;border-radius:inherit;}
+.l-bar::before{width:40%;background:linear-gradient(90deg,rgba(0,245,255,0),rgba(0,245,255,.9) 60%,rgba(191,0,255,.7));animation:lSweep 1.6s cubic-bezier(.45,.05,.35,1) infinite;}
+.l-bar::after{right:0;background:linear-gradient(90deg,rgba(0,245,255,.85),rgba(191,0,255,.6));opacity:0;transform:scaleX(.3);transform-origin:left;transition:opacity .2s ease,transform .3s cubic-bezier(.2,.7,.2,1);}
+@keyframes lSweep{from{transform:translateX(-100%);}to{transform:translateX(250%);}}
+.is-ready .l-bar::before{opacity:0;transition:opacity .15s ease;}
+.is-ready .l-bar::after{opacity:1;transform:none;}
+.l-status{font-size:.8rem;line-height:1.2;letter-spacing:.05em;color:var(--muted);}
+/* Identity reveal: a short fade and rise, one line after another. js/main.js waits for .l-progress to finish. */
+.l-name,.l-role,.l-progress{animation:lRise .5s cubic-bezier(.2,.7,.2,1) backwards;}
+.l-name{animation-delay:.06s;}.l-role{animation-delay:.13s;}.l-progress{animation-delay:.2s;}
+@keyframes lRise{from{opacity:0;transform:translateY(8px);}}
+/* Leaving: everything but the network fades; the network settles into the hero molecule (js/main.js). */
+.is-leaving .l-copy{opacity:0;transform:translateY(-6px);transition:opacity .25s ease,transform .4s ease;}
+.is-leaving .l-charts{opacity:0;transition:opacity .4s ease;}
+.is-leaving .l-bg,.is-leaving .l-stage::before{opacity:0;transition:opacity .55s ease .1s;}
+/* Decorative corner charts: drawings with no data, kept faint so the name stays the focus.
+   They move slowly and continuously (scroll, breathe, turn) rather than jumping between random values. */
+.l-charts{position:absolute;inset:0;z-index:1;pointer-events:none;--e:clamp(20px,3vw,44px);}
+.l-chart{position:absolute;width:clamp(148px,12.5vw,190px);height:auto;aspect-ratio:184/108;opacity:.6;overflow:visible;animation:lChartIn 1.1s ease backwards;}
+.l-chart--line{top:var(--e);left:var(--e);animation-delay:.35s;}
+.l-chart--bars{top:var(--e);right:var(--e);animation-delay:.45s;}
+.l-chart--donut{bottom:var(--e);left:var(--e);animation-delay:.55s;}
+.l-chart--scatter{bottom:var(--e);right:var(--e);animation-delay:.65s;}
+@keyframes lChartIn{from{opacity:0;transform:translateY(6px);}}
+.l-card{fill:rgba(255,255,255,.016);stroke:rgba(255,255,255,.07);}
+.l-sk{fill:rgba(255,255,255,.12);}.l-sk--2{fill:rgba(255,255,255,.06);}
+.l-grid{fill:none;stroke:rgba(255,255,255,.06);stroke-dasharray:2 4;}
+.l-axis{fill:none;stroke:rgba(255,255,255,.1);}
+.l-line{fill:none;stroke:rgba(0,245,255,.7);stroke-width:1.2;stroke-linejoin:round;}
+.l-scroll{animation:lScroll 22s linear infinite;}
+@keyframes lScroll{to{transform:translateX(-152px);}}
+.l-b{fill:url(#lc-bar);transform-box:fill-box;transform-origin:50% 100%;animation:lBreathe 4.6s ease-in-out var(--d,0s) infinite alternate;}
+.l-b--accent{fill:url(#lc-bar2);}
+@keyframes lBreathe{from{transform:scaleY(var(--lo,.85));}to{transform:scaleY(1);}}
+.l-ring-in{fill:none;stroke:rgba(255,255,255,.05);}
+.l-arc{fill:none;stroke-width:6;}
+.l-arc--c{stroke:rgba(0,245,255,.6);}.l-arc--p{stroke:rgba(191,0,255,.5);}.l-arc--n{stroke:rgba(255,255,255,.12);}
+.l-spin{transform-box:fill-box;transform-origin:50% 50%;animation:lSpin 60s linear infinite;}
+@keyframes lSpin{to{transform:rotate(360deg);}}
+.l-key--c{fill:rgba(0,245,255,.7);}.l-key--p{fill:rgba(191,0,255,.6);}.l-key--n{fill:rgba(255,255,255,.2);}
+.l-band{fill:rgba(0,245,255,.05);}
+.l-trend{fill:none;stroke:rgba(0,245,255,.3);stroke-dasharray:3 3;}
+.l-trace{fill:none;stroke:rgba(0,245,255,.85);stroke-width:1.4;stroke-linecap:round;stroke-dasharray:12 300;animation:lTrace 6s ease-in-out infinite;}
+@keyframes lTrace{0%{stroke-dashoffset:12;}60%,100%{stroke-dashoffset:-100;}}
+.l-dot{fill:rgba(0,245,255,.75);animation:lTwinkle 3.6s ease-in-out var(--d,0s) infinite alternate;}
+.l-dot--accent{fill:rgba(191,0,255,.7);}
+@keyframes lTwinkle{from{opacity:.35;}to{opacity:1;}}
+/* Tablets keep two charts; phones and short screens keep only the backdrop */
+@media(max-width:1023px){.l-chart--bars,.l-chart--donut{display:none;}}
+@media(max-width:639px),(max-height:539px){.l-charts{display:none;}.l-bg::before{background-size:44px 44px;opacity:.75;}}
 
 /* ── PAGE ────────────────────────────────── */
 .page{position:relative;z-index:1;}
@@ -379,4 +433,6 @@ footer{padding:2rem var(--gutter) 6.5rem;text-align:center;font-size:.8rem;color
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
   .js .fade-in,.js .stagger>*{opacity:1;transform:none;}
   .type-cursor{display:none;}
+  /* The loader is skipped for these visitors; if it ever shows, the bar is static. */
+  .l-bar::before{display:none;}.l-bar::after{opacity:.5;transform:none;}
 }

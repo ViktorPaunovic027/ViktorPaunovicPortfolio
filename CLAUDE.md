@@ -6,8 +6,8 @@ Static portfolio on Netlify (viktorpaunovic.com): one home page and three case-s
 
 - Home page markup: `index.html`. Styles: `css/main.css`. Script: `js/main.js`.
 - Dashboard: edit `src/dashboard.jsx`, then rebuild `js/dashboard.min.js` with the esbuild command in `README.md`. Commit both.
-- Loader: `#loader` in `index.html`; `playIntro()` and `initLoaderBg()` in `js/main.js`; the intro-once logic is the inline script in `<head>`.
-- Molecule: the static SVG `#mol-sym` in `index.html` and the 3D version `buildMolecule()` in `js/main.js` share `molGeometry()`. If you change the geometry, regenerate the SVG to match.
+- Loader: `#loader` in `index.html` (its corner charts are static SVG drawings with no values); the LOADER section of `css/main.css`; `initLoaderNet()` (the network canvas) and `playIntro()` (readiness and exit) in `js/main.js`; the intro-once logic is the inline script in `<head>`.
+- Molecule: the static SVG `#mol-sym` in `index.html`, the 3D version `buildMolecule()` and the loader network `initLoaderNet()` in `js/main.js` share `molGeometry()` and the same camera. If you change the geometry, regenerate the SVG to match.
 - Libraries: pinned copies in `vendor/`. Fonts: `fonts/`.
 - Case studies: `projects/<name>/index.html`. Each page has its own inline CSS and JS. They share only `fonts/` with the home page.
 - Improvement plan: `IMPROVEMENTS.md`.
