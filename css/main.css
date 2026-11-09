@@ -75,12 +75,14 @@ html.has-cursor,html.has-cursor body{cursor:none;}
 .is-leaving .l-bg,.is-leaving .l-stage::before{opacity:0;transition:opacity .55s ease .1s;}
 /* Decorative corner charts: drawings with no data, kept faint so the name stays the focus.
    They move slowly and continuously (scroll, breathe, turn) rather than jumping between random values. */
-.l-charts{position:absolute;inset:0;z-index:1;pointer-events:none;--e:clamp(20px,3vw,44px);}
+.l-charts{position:absolute;inset:0;z-index:1;pointer-events:none;--ex:clamp(20px,3vw,44px);--ey:var(--ex);}
 .l-chart{position:absolute;width:clamp(148px,12.5vw,190px);height:auto;aspect-ratio:184/108;opacity:.6;overflow:visible;animation:lChartIn 1.1s ease backwards;}
-.l-chart--line{top:var(--e);left:var(--e);animation-delay:.35s;}
-.l-chart--bars{top:var(--e);right:var(--e);animation-delay:.45s;}
-.l-chart--donut{bottom:var(--e);left:var(--e);animation-delay:.55s;}
-.l-chart--scatter{bottom:var(--e);right:var(--e);animation-delay:.65s;}
+.l-chart--line{top:var(--ey);left:var(--ex);animation-delay:.35s;}
+.l-chart--bars{top:var(--ey);right:var(--ex);animation-delay:.45s;}
+.l-chart--donut{bottom:var(--ey);left:var(--ex);animation-delay:.55s;}
+.l-chart--scatter{bottom:var(--ey);right:var(--ex);animation-delay:.65s;}
+/* Desktop: the charts sit further in from the edges, closer to the centre. Tablets and phones keep the corner inset. */
+@media(min-width:1024px){.l-charts{--ex:clamp(44px,9vw,200px);--ey:clamp(32px,8vh,100px);}}
 @keyframes lChartIn{from{opacity:0;transform:translateY(6px);}}
 .l-card{fill:rgba(255,255,255,.016);stroke:rgba(255,255,255,.07);}
 .l-sk{fill:rgba(255,255,255,.12);}.l-sk--2{fill:rgba(255,255,255,.06);}
