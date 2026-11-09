@@ -1,2 +1,4 @@
-# Notes, plans and handoffs stay on this computer. The repository is public and Netlify publishes every tracked file.
+# Files that stay on this computer. The repository is public and Netlify publishes every tracked file.
 *.md
+src/
+og-image.svg

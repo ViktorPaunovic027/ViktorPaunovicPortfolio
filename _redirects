@@ -1,4 +1,2 @@
-# Netlify rules. Files that are in git but are not part of the website answer "not found".
-/src/*          /not-found  404!
-/og-image.svg   /not-found  404!
+# Netlify rules. Files in git that are not part of the website answer "not found".
 /.gitignore     /not-found  404!
