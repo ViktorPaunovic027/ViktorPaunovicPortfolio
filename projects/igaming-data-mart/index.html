@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iGaming Data Mart | Viktor Paunovic</title>
+  <meta name="description" content="A star-schema data mart for simulated iGaming data, built with dbt and DuckDB: one definition for GGR, NGR and FTD, euro amounts, Malta reporting days and VIP tier history.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://viktorpaunovic.com/projects/igaming-data-mart/">
+  <meta property="og:title" content="iGaming Data Mart | Viktor Paunovic">
+  <meta property="og:description" content="A star-schema data mart for simulated iGaming data, built with dbt and DuckDB and covered by 86 data tests.">
+  <meta property="og:site_name" content="Viktor Paunovic Portfolio">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://viktorpaunovic.com/projects/igaming-data-mart/">
+  <!-- Content that animates in is hidden only once JavaScript is known to run. -->
+  <script>document.documentElement.classList.add('js')</script>
+  <!-- Self-hosted font, shared with the home page (fonts/). This page only uses Inter. -->
+  <style>@font-face{font-family:'Inter';font-style:normal;font-weight:300 700;font-display:swap;src:url(../../fonts/inter-latin-v20.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}</style>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Cpath d='M13 46V31h8v15zm15 0V20h8v26zm15 0V12h8v34z' fill='%2300f5ff'/%3E%3C/svg%3E">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0a0a0f;--panel:#111119;--line:rgba(255,255,255,.085);
+      --cyan:#00f5ff;--purple:#bf00ff;--violet:#d38bff;--green:#00ff88;--amber:#f5a623;--red:#ff577f;
+      --white:#f3f4ff;--muted:rgba(240,240,255,.62);--soft:rgba(240,240,255,.8);
+      --bronze:#d39a6a;--silver:#c9d1e0;--gold:#f5c542;--platinum:#9fe8ff;
+      --radius:18px;--shadow:0 24px 60px rgba(0,0,0,.24);
+      --mono:ui-monospace,"Cascadia Code","SFMono-Regular",Consolas,"Liberation Mono",monospace
+    }
+    html{scroll-behavior:smooth;scroll-padding-top:90px}
+    body{min-width:280px;background:var(--bg);color:var(--white);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.55;overflow-x:hidden}
+    a{color:inherit;font:inherit}
+    ::selection{background:rgba(0,245,255,.26);color:#fff}
+    .skip-link{position:fixed;left:1rem;top:-5rem;z-index:100;background:var(--cyan);color:#001316;padding:.7rem 1rem;border-radius:8px;font-weight:800;text-decoration:none;transition:top .2s}
+    .skip-link:focus{top:1rem}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .aurora{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(circle at 8% 8%,rgba(0,245,255,.08),transparent 30%),radial-gradient(circle at 91% 27%,rgba(191,0,255,.08),transparent 28%),linear-gradient(rgba(10,10,15,.78),rgba(10,10,15,.96))}
+    .grid-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(0,245,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,.022) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(to bottom,black,transparent 72%);-webkit-mask-image:linear-gradient(to bottom,black,transparent 72%)}
+    .shell{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+    :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+    /* nav */
+    .topbar{position:sticky;top:0;z-index:40;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(10,10,15,.76);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;font-weight:800;letter-spacing:-.02em}
+    .brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(0,245,255,.3);border-radius:10px;background:linear-gradient(145deg,rgba(0,245,255,.14),rgba(191,0,255,.1));color:var(--cyan)}
+    .brand-mark svg{width:18px}
+    .brand small{display:block;color:var(--muted);font-size:.6rem;line-height:1.1;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+    .nav-actions{display:flex;align-items:center;gap:.6rem}
+    .nav-link,.button{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:40px;border-radius:999px;padding:.58rem 1rem;text-decoration:none;font-size:.8rem;font-weight:700;letter-spacing:.02em;transition:transform .2s,border-color .2s,background .2s,color .2s,box-shadow .2s}
+    .nav-link{color:var(--soft);border:1px solid var(--line);background:rgba(255,255,255,.025)}
+    .nav-link:hover,.nav-link:focus-visible{color:#fff;border-color:rgba(0,245,255,.34);background:rgba(0,245,255,.07)}
+    .button{border:1px solid rgba(0,245,255,.33);color:#001114;background:var(--cyan);box-shadow:0 8px 28px rgba(0,245,255,.14)}
+    .button:hover,.button:focus-visible{transform:translateY(-2px);box-shadow:0 12px 34px rgba(0,245,255,.28)}
+    .button.secondary{color:#fff;background:rgba(255,255,255,.035);border-color:var(--line);box-shadow:none}
+    .button.secondary:hover,.button.secondary:focus-visible{border-color:rgba(0,245,255,.3);background:rgba(0,245,255,.06)}
+    .button svg{width:15px;height:15px}
+
+    /* hero */
+    .hero{padding:6.4rem 0 2.2rem;position:relative}
+    .hero::after{content:"";position:absolute;left:54%;top:12%;width:44vw;height:44vw;max-width:600px;max-height:600px;background:radial-gradient(circle,rgba(0,245,255,.075),rgba(191,0,255,.025) 43%,transparent 70%);filter:blur(4px);pointer-events:none;z-index:-1}
+    .breadcrumbs{display:flex;align-items:center;gap:.55rem;color:var(--muted);font-size:.76rem;margin-bottom:1.8rem}
+    .breadcrumbs a{text-decoration:none}.breadcrumbs a:hover{color:var(--cyan)}
+    .eyebrow{display:flex;align-items:center;gap:.65rem;color:var(--cyan);font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.18em}
+    .eyebrow::before{content:"";width:28px;height:1px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+    h1{max-width:880px;margin:.9rem 0 1.2rem;font-size:clamp(2.7rem,8vw,6.4rem);line-height:.94;letter-spacing:-.055em;font-weight:800}
+    h1 span{background:linear-gradient(105deg,#fff 18%,var(--cyan) 60%,#9a7cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-copy{max-width:720px;color:var(--soft);font-size:clamp(.98rem,2vw,1.14rem)}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:1.65rem}
+    .pill{display:inline-flex;align-items:center;gap:.45rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);padding:.46rem .78rem;color:var(--soft);font-size:.72rem;font-weight:700}
+    .pill i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+    .pill.sim i{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.6rem}
+
+
+    /* sections */
+    .section{padding:3.2rem 0 3.6rem}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem}
+    .section-kicker{color:var(--cyan);font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.17em;margin-bottom:.35rem}
+    h2{font-size:clamp(1.6rem,3.5vw,2.45rem);line-height:1.08;letter-spacing:-.035em}
+    h3{font-size:1rem;letter-spacing:-.01em}
+    .section-note{max-width:500px;color:var(--muted);font-size:.86rem}
+    .lead{max-width:760px;color:var(--soft);font-size:.95rem;margin-bottom:1.4rem}
+    .glass{background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card{padding:1.35rem}
+    .card p{color:var(--muted);font-size:.84rem}
+    .card h3{margin-bottom:.55rem}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .caption{color:var(--muted);font-size:.74rem;margin-top:.8rem}
+    .num{font-variant-numeric:tabular-nums}
+
+    /* stats */
+    .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:.8rem}
+    .stat{padding:1rem 1.05rem;border:1px solid var(--line);border-radius:14px;background:rgba(8,9,15,.56);position:relative;overflow:hidden}
+    .stat::after{content:"";position:absolute;left:0;bottom:0;width:52%;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);opacity:.6}
+    .stat:nth-child(2n)::after{background:linear-gradient(90deg,var(--purple),transparent)}
+    .stat b{display:block;font-size:clamp(1.3rem,2.3vw,1.75rem);line-height:1.05;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+    .stat span{display:block;margin-top:.35rem;color:var(--muted);font-size:.7rem;font-weight:600}
+
+    /* schema diagram */
+    .schema-wrap{padding:1.1rem;overflow:hidden}
+    .schema-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    #schema{display:block;width:100%;min-width:760px;height:auto}
+    #schema text{font-family:Inter,"Segoe UI",Arial,sans-serif}
+    .node rect{stroke-width:1.2;transition:stroke .2s,fill .2s,opacity .2s}
+    .node .t{font-size:13px;font-weight:700;fill:#f3f4ff}
+    .node .s{font-size:10.5px;fill:rgba(240,240,255,.6)}
+    .node.fact rect{fill:rgba(0,245,255,.06);stroke:rgba(0,245,255,.45)}
+    .node.dim rect{fill:rgba(191,0,255,.06);stroke:rgba(191,0,255,.45)}
+    .node.metric rect{fill:rgba(245,166,35,.06);stroke:rgba(245,166,35,.45)}
+    .edge{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1.3;transition:stroke .2s,opacity .2s}
+    .bus{stroke:rgba(255,255,255,.22);stroke-width:2}
+    .col-label{font-size:10px;font-weight:800;letter-spacing:.14em;fill:rgba(240,240,255,.45)}
+    .badge rect{fill:rgba(0,255,136,.12);stroke:rgba(0,255,136,.5)}
+    .badge text{font-size:9px;font-weight:800;fill:var(--green);letter-spacing:.06em}
+    .js .node{cursor:pointer}
+    .js .node:focus{outline:none}
+    .js .node:focus-visible rect{stroke:#fff;stroke-width:2}
+    .schema-active .node{opacity:.35}
+    .schema-active .edge{opacity:.25}
+    .schema-active .node.on{opacity:1}
+    .schema-active .node.on rect{stroke:#fff}
+    .schema-active .edge.on{opacity:1;stroke:var(--cyan)}
+    .detail{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1rem;margin-top:.9rem;padding:.9rem 1rem;border:1px solid var(--line);border-radius:12px;background:rgba(8,9,15,.5);font-size:.8rem;min-height:4.6rem}
+    .detail dt{color:var(--muted)}
+    .detail dd{color:var(--soft)}
+    .detail .name{font-family:var(--mono);color:var(--cyan)}
+    .legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:.8rem;color:var(--muted);font-size:.72rem}
+    .legend span{display:inline-flex;align-items:center;gap:.4rem}
+    .legend i{width:12px;height:12px;border-radius:3px;border:1px solid}
+
+    /* tables */
+    .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(8,9,15,.5)}
+    table{width:100%;border-collapse:collapse;font-size:.8rem}
+    th,td{text-align:left;padding:.62rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}
+    thead th{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;background:rgba(255,255,255,.02)}
+    tbody tr:last-child td{border-bottom:0}
+    td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    code,.code{font-family:var(--mono);font-size:.78em}
+    td code{color:var(--cyan)}
+    .tag{display:inline-block;padding:.12rem .45rem;border-radius:999px;font-size:.64rem;font-weight:800;letter-spacing:.04em;white-space:nowrap}
+    .tag.fact{color:var(--cyan);background:rgba(0,245,255,.08)}
+    .tag.dim{color:var(--violet);background:rgba(191,0,255,.1)}
+    .tag.metric{color:var(--amber);background:rgba(245,166,35,.1)}
+    details.catalogue{margin-top:1rem}
+    details.catalogue summary{cursor:pointer;color:var(--soft);font-size:.84rem;font-weight:700;padding:.4rem 0;list-style-position:inside}
+    details.catalogue summary:hover{color:var(--cyan)}
+    details.catalogue[open] summary{margin-bottom:.7rem}
+
+    pre{margin-top:1rem;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:12px;background:#07080d;overflow-x:auto;font-family:var(--mono);font-size:.76rem;line-height:1.6;color:var(--soft)}
+    pre .c{color:rgba(240,240,255,.42)}
+    pre .k{color:var(--violet)}
+    pre .f{color:var(--cyan)}
+
+    /* time zones */
+    .steps{list-style:none;display:grid;gap:.6rem;margin-top:.9rem;counter-reset:s}
+    .steps li{display:grid;grid-template-columns:28px 1fr;gap:.7rem;align-items:start;font-size:.83rem;color:var(--soft)}
+    .steps li::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:linear-gradient(145deg,rgba(0,245,255,.12),rgba(191,0,255,.1));color:var(--cyan);font-size:.7rem;font-weight:900}
+    .steps b{color:#fff}
+    .steps small{display:block;color:var(--muted);font-size:.74rem}
+    .fx-table td:nth-child(3){color:var(--muted)}
+    .bars{display:grid;gap:.55rem;margin-top:1rem}
+    .bar-row{display:grid;grid-template-columns:118px 1fr 52px;gap:.75rem;align-items:center;font-size:.78rem;color:var(--soft)}
+    .bar-track{height:9px;border-radius:99px;background:rgba(255,255,255,.055);overflow:hidden}
+    .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple),var(--cyan))}
+    .bar-row .r{text-align:right;font-variant-numeric:tabular-nums;color:#fff;font-weight:700}
+
+    /* VIP timeline */
+    .timeline{display:flex;gap:3px;margin-top:1.1rem;list-style:none}
+    .seg{flex-basis:0;min-width:58px;padding:.6rem .55rem;border-radius:9px;border-top:3px solid;background:rgba(255,255,255,.035);font-size:.72rem;color:var(--soft)}
+    .seg b{display:block;font-size:.8rem}
+    .seg .when{display:block;color:var(--muted);font-size:.66rem}
+    .seg .ggr{display:block;margin-top:.35rem;font-weight:700;font-variant-numeric:tabular-nums;color:#fff}
+    .seg.bronze{border-color:var(--bronze)}.seg.bronze b{color:var(--bronze)}
+    .seg.silver{border-color:var(--silver)}.seg.silver b{color:var(--silver)}
+    .seg.gold{border-color:var(--gold)}.seg.gold b{color:var(--gold)}
+    .seg.open{background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 6px,transparent 6px 12px)}
+    .tier-chart{display:grid;gap:.85rem;margin-top:1.1rem}
+    .tier-row{display:grid;grid-template-columns:78px 1fr;gap:.8rem;align-items:center}
+    .tier-row>span{font-size:.8rem;font-weight:700}
+    .tier-bars{display:grid;gap:4px}
+    .tbar{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--soft);font-variant-numeric:tabular-nums}
+    .tbar i{display:block;height:12px;border-radius:3px;min-width:2px}
+    .tbar.then i{background:var(--cyan)}
+    .tbar.now i{background:rgba(191,0,255,.75)}
+    .key{display:flex;flex-wrap:wrap;gap:1rem;color:var(--muted);font-size:.72rem;margin-top:.9rem}
+    .key span{display:inline-flex;align-items:center;gap:.4rem}
+    .key i{width:12px;height:12px;border-radius:3px}
+
+    /* tests */
+    .test-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.7rem;margin-bottom:1rem}
+    .test-grid div{padding:.85rem .9rem;border:1px solid var(--line);border-radius:12px;background:rgba(8,9,15,.5)}
+    .test-grid b{display:block;font-size:1.35rem;letter-spacing:-.03em;color:var(--green)}
+    .test-grid span{font-size:.7rem;color:var(--muted)}
+    .checks{list-style:none;display:grid;gap:.5rem;margin-top:.8rem}
+    .checks li{display:grid;grid-template-columns:18px 1fr;gap:.6rem;font-size:.82rem;color:var(--soft)}
+    .checks li::before{content:"";width:16px;height:16px;margin-top:.15rem;border-radius:50%;background:rgba(0,255,136,.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff88' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/10px no-repeat}
+    .issues td:first-child{font-variant-numeric:tabular-nums;font-weight:800;color:#fff;white-space:nowrap;text-align:right}
+    .story{margin-top:1rem;padding:1rem 1.15rem;border-left:3px solid var(--cyan);border-radius:4px 12px 12px 4px;background:rgba(0,245,255,.05);color:var(--soft);font-size:.84rem}
+    .story b{color:#fff}
+
+    /* next */
+    .next{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;list-style:none}
+    .next li{padding:1.1rem;border:1px solid var(--line);border-radius:14px;background:rgba(8,9,15,.5)}
+    .next h3{font-size:.92rem;margin:.45rem 0 .35rem}
+    .next p{font-size:.78rem;color:var(--muted)}
+    .status{display:inline-block;padding:.15rem .5rem;border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+
+    .cta{margin:2rem auto 6rem;padding:2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;position:relative;overflow:hidden}
+    .cta::after{content:"";position:absolute;right:-80px;top:-110px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,245,255,.15),transparent 68%);pointer-events:none}
+    .cta-copy{position:relative;z-index:1}.cta h2{margin-bottom:.4rem}.cta p{color:var(--muted);font-size:.84rem;max-width:620px}
+    .cta-actions{position:relative;z-index:1;display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end}
+    footer{border-top:1px solid var(--line);padding:1.8rem 0 2.4rem;color:rgba(255,255,255,.4);font-size:.7rem}
+    .footer-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .footer-row a{text-decoration:none}.footer-row a:hover{color:var(--cyan)}
+    .data-disclaimer{display:block;margin-top:.8rem;text-align:center;color:rgba(255,255,255,.34);font-size:.62rem;line-height:1.5}
+
+    .js .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+    .js .reveal.visible{opacity:1;transform:none}
+
+    @media(max-width:1050px){.stats{grid-template-columns:repeat(3,1fr)}.test-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:860px){.two,.next{grid-template-columns:1fr}.section-head{display:block}.section-note{margin-top:.6rem}}
+    @media(max-width:760px){.shell{width:min(100% - 32px,1180px)}.hero{padding-top:4.5rem}.nav-link.hide-small{display:none}.cta{align-items:flex-start;flex-direction:column}.cta-actions{justify-content:flex-start}.footer-row{align-items:flex-start;flex-direction:column}.timeline{flex-direction:column}.seg{flex:0 0 auto!important}.bar-row{grid-template-columns:96px 1fr 46px}}
+    @media(max-width:520px){.stats,.test-grid{grid-template-columns:repeat(2,1fr)}.brand-text{display:none}.nav{height:64px}h1{font-size:2.6rem}.card{padding:1.05rem}.detail{grid-template-columns:1fr}.tier-row{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.js .reveal{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <nav class="nav shell" aria-label="Project navigation">
+      <a class="brand" href="../../index.html#projects" aria-label="Back to Viktor Paunovic portfolio projects">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9m6 10V4m6 15v-7m4 7H2"/></svg></span>
+        <span class="brand-text">Viktor Paunovic<small>Analytics portfolio</small></span>
+      </a>
+      <div class="nav-actions">
+        <a class="nav-link hide-small" href="#model">Model</a>
+        <a class="nav-link hide-small" href="#tests">Tests</a>
+        <a class="nav-link" href="../../index.html#projects">← Projects</a>
+        <a class="button" href="../../index.html#links">Contact me</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="hero shell">
+      <div class="breadcrumbs" aria-label="Breadcrumb"><a href="../../index.html">Portfolio</a><span aria-hidden="true">/</span><a href="../../index.html#projects">Projects</a><span aria-hidden="true">/</span><span>iGaming Data Mart</span></div>
+      <div class="eyebrow">Data modelling case study</div>
+      <h1>iGaming <span>Data Mart</span></h1>
+      <p class="hero-copy">A star schema for bets, payments and bonuses, built with dbt on DuckDB. Every report reads the same GGR, NGR and FTD, in euros, on Malta reporting days, with each player's VIP tier as it was at the time.</p>
+      <div class="hero-meta" aria-label="Project details">
+        <span class="pill"><i></i> 86 of 86 data tests passing</span>
+        <span class="pill">Python · dbt · DuckDB · SQL</span>
+        <span class="pill sim"><i></i> Simulated data</span>
+      </div>
+      <div class="hero-actions">
+        <a class="button secondary" href="#model">See the model</a>
+      </div>
+    </section>
+
+    <section class="section shell reveal" aria-labelledby="scale-title">
+      <h2 id="scale-title" class="sr-only">What the mart holds</h2>
+      <div class="stats">
+        <div class="stat"><b>70,367</b><span>Simulated players</span></div>
+        <div class="stat"><b>1.22M</b><span>Sportsbook bets</span></div>
+        <div class="stat"><b>950K</b><span>Casino sessions</span></div>
+        <div class="stat"><b>582K</b><span>Payment attempts</span></div>
+        <div class="stat"><b>7 · 6</b><span>Markets · currencies</span></div>
+        <div class="stat"><b>18</b><span>Months, Apr 2025 to Sep 2026</span></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ model -->
+    <section class="section shell reveal" id="model" aria-labelledby="model-title">
+      <div class="section-head">
+        <div><div class="section-kicker">The model</div><h2 id="model-title">One star schema, seven fact tables</h2></div>
+        <p class="section-note">Every fact carries the player's version key, the reporting day, the brand and the market. Select a table to see its grain.</p>
+      </div>
+      <div class="schema-wrap glass">
+        <div class="schema-scroll">
+          <svg id="schema" viewBox="0 0 960 570" role="group" aria-label="Star schema: seven fact tables in the middle, shared dimensions on the left, specific dimensions on the right, and three metric tables below.">
+            <text class="col-label" x="20" y="30">SHARED BY EVERY FACT</text>
+            <text class="col-label" x="350" y="30">FACTS</text>
+            <text class="col-label" x="700" y="30">SPECIFIC DIMENSIONS</text>
+
+            <!-- edges: shared dimensions to the bus, bus to every fact -->
+            <path class="edge bus" data-from="bus" d="M290 66V462"/>
+            <path class="edge" data-a="dim_player" d="M232 76H290"/>
+            <path class="edge" data-a="dim_date" d="M232 236H290"/>
+            <path class="edge" data-a="dim_market" d="M232 306H290"/>
+            <path class="edge" data-a="dim_brand" d="M232 376H290"/>
+            <path class="edge" data-a="dim_player" data-b="dim_affiliate" d="M126 104V146"/>
+            <path class="edge" data-a="fct_wagering_daily" d="M290 76H340"/>
+            <path class="edge" data-a="fct_sportsbook_bets" d="M290 140H340"/>
+            <path class="edge" data-a="fct_payments" d="M290 204H340"/>
+            <path class="edge" data-a="fct_bonuses" d="M290 268H340"/>
+            <path class="edge" data-a="fct_campaign_assignments" d="M290 332H340"/>
+            <path class="edge" data-a="fct_player_activity_daily" d="M290 396H340"/>
+            <path class="edge" data-a="fct_account_events" d="M290 460H340"/>
+            <!-- specific dimensions -->
+            <path class="edge" data-a="fct_wagering_daily" data-b="dim_game" d="M620 76H660C680 76 680 76 700 76"/>
+            <path class="edge" data-a="fct_sportsbook_bets" data-b="dim_game" d="M620 140H655C670 140 670 84 700 84"/>
+            <path class="edge" data-a="dim_game" data-b="dim_provider" d="M820 104V146"/>
+            <path class="edge" data-a="fct_payments" data-b="dim_psp" d="M620 204H660C680 204 680 236 700 236"/>
+            <path class="edge" data-a="fct_bonuses" data-b="dim_campaign" d="M620 268H660C680 268 680 306 700 306"/>
+            <path class="edge" data-a="fct_campaign_assignments" data-b="dim_campaign" d="M620 332H660C680 332 680 314 700 314"/>
+            <!-- facts feed the metric tables -->
+            <path class="edge" data-a="kpi" d="M480 486V510"/>
+
+            <!-- shared dimensions -->
+            <g class="node dim" data-id="dim_player" tabindex="0" role="button" aria-label="dim_player, dimension with VIP history">
+              <rect x="20" y="48" width="212" height="56" rx="10"/>
+              <text class="t" x="34" y="72">dim_player</text><text class="s" x="34" y="91">Player x VIP tier version</text>
+              <g class="badge"><rect x="168" y="58" width="54" height="18" rx="9"/><text x="176" y="71">SCD 2</text></g>
+            </g>
+            <g class="node dim" data-id="dim_affiliate" tabindex="0" role="button" aria-label="dim_affiliate, dimension">
+              <rect x="40" y="146" width="172" height="44" rx="10"/>
+              <text class="t" x="54" y="166">dim_affiliate</text><text class="s" x="54" y="181">via the player</text>
+            </g>
+            <g class="node dim" data-id="dim_date" tabindex="0" role="button" aria-label="dim_date, dimension">
+              <rect x="20" y="208" width="212" height="56" rx="10"/>
+              <text class="t" x="34" y="232">dim_date</text><text class="s" x="34" y="251">Malta reporting day</text>
+            </g>
+            <g class="node dim" data-id="dim_market" tabindex="0" role="button" aria-label="dim_market, dimension">
+              <rect x="20" y="278" width="212" height="56" rx="10"/>
+              <text class="t" x="34" y="302">dim_market</text><text class="s" x="34" y="321">Currency and time zone</text>
+            </g>
+            <g class="node dim" data-id="dim_brand" tabindex="0" role="button" aria-label="dim_brand, dimension">
+              <rect x="20" y="348" width="212" height="56" rx="10"/>
+              <text class="t" x="34" y="372">dim_brand</text><text class="s" x="34" y="391">Brand</text>
+            </g>
+
+            <!-- facts -->
+            <g class="node fact" data-id="fct_wagering_daily" tabindex="0" role="button" aria-label="fct_wagering_daily, fact table">
+              <rect x="340" y="54" width="280" height="44" rx="10"/>
+              <text class="t" x="354" y="74">fct_wagering_daily</text><text class="s" x="354" y="89">Player x game x day</text>
+            </g>
+            <g class="node fact" data-id="fct_sportsbook_bets" tabindex="0" role="button" aria-label="fct_sportsbook_bets, fact table">
+              <rect x="340" y="118" width="280" height="44" rx="10"/>
+              <text class="t" x="354" y="138">fct_sportsbook_bets</text><text class="s" x="354" y="153">One row per bet</text>
+            </g>
+            <g class="node fact" data-id="fct_payments" tabindex="0" role="button" aria-label="fct_payments, fact table">
+              <rect x="340" y="182" width="280" height="44" rx="10"/>
+              <text class="t" x="354" y="202">fct_payments</text><text class="s" x="354" y="217">One row per payment attempt</text>
+            </g>
+            <g class="node fact" data-id="fct_bonuses" tabindex="0" role="button" aria-label="fct_bonuses, fact table">
+              <rect x="340" y="246" width="280" height="44" rx="10"/>
+              <text class="t" x="354" y="266">fct_bonuses</text><text class="s" x="354" y="281">One row per bonus</text>
+            </g>
+            <g class="node fact" data-id="fct_campaign_assignments" tabindex="0" role="button" aria-label="fct_campaign_assignments, fact table">
+              <rect x="340" y="310" width="280" height="44" rx="10"/>
+              <text class="t" x="354" y="330">fct_campaign_assignments</text><text class="s" x="354" y="345">Player x campaign</text>
+            </g>
+            <g class="node fact" data-id="fct_player_activity_daily" tabindex="0" role="button" aria-label="fct_player_activity_daily, fact table">
+              <rect x="340" y="374" width="280" height="44" rx="10"/>
+              <text class="t" x="354" y="394">fct_player_activity_daily</text><text class="s" x="354" y="409">Player x day</text>
+            </g>
+            <g class="node fact" data-id="fct_account_events" tabindex="0" role="button" aria-label="fct_account_events, fact table">
+              <rect x="340" y="438" width="280" height="44" rx="10"/>
+              <text class="t" x="354" y="458">fct_account_events</text><text class="s" x="354" y="473">Limits, cool-offs, exclusions</text>
+            </g>
+
+            <!-- specific dimensions -->
+            <g class="node dim" data-id="dim_game" tabindex="0" role="button" aria-label="dim_game, dimension">
+              <rect x="700" y="48" width="240" height="56" rx="10"/>
+              <text class="t" x="714" y="72">dim_game</text><text class="s" x="714" y="91">Casino game or sport</text>
+            </g>
+            <g class="node dim" data-id="dim_provider" tabindex="0" role="button" aria-label="dim_provider, dimension">
+              <rect x="730" y="146" width="180" height="44" rx="10"/>
+              <text class="t" x="744" y="166">dim_provider</text><text class="s" x="744" y="181">via the game</text>
+            </g>
+            <g class="node dim" data-id="dim_psp" tabindex="0" role="button" aria-label="dim_psp, dimension">
+              <rect x="700" y="208" width="240" height="56" rx="10"/>
+              <text class="t" x="714" y="232">dim_psp</text><text class="s" x="714" y="251">Payment provider</text>
+            </g>
+            <g class="node dim" data-id="dim_campaign" tabindex="0" role="button" aria-label="dim_campaign, dimension">
+              <rect x="700" y="282" width="240" height="56" rx="10"/>
+              <text class="t" x="714" y="306">dim_campaign</text><text class="s" x="714" y="325">Welcome and CRM offers</text>
+            </g>
+
+            <!-- metrics -->
+            <g class="node metric" data-id="kpi" tabindex="0" role="button" aria-label="Metric tables">
+              <rect x="200" y="510" width="560" height="48" rx="10"/>
+              <text class="t" x="216" y="531">kpi_daily_revenue · kpi_daily_ggr_by_product · kpi_daily_accounts</text>
+              <text class="s" x="216" y="547">Metrics layer: complete Malta days only, every number from the shared definitions</text>
+            </g>
+          </svg>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><i style="border-color:rgba(0,245,255,.6);background:rgba(0,245,255,.08)"></i>Fact table</span>
+          <span><i style="border-color:rgba(191,0,255,.6);background:rgba(191,0,255,.08)"></i>Dimension</span>
+          <span><i style="border-color:rgba(245,166,35,.6);background:rgba(245,166,35,.08)"></i>Metrics layer</span>
+        </div>
+        <dl class="detail" id="schema-detail" aria-live="polite">
+          <dt>Table</dt><dd><span class="name">fct_wagering_daily</span></dd>
+          <dt>Grain</dt><dd>One row per player, game (or sport) and Malta reporting day</dd>
+          <dt>About</dt><dd>Real-money and bonus wagering. Casino play is dated by session start, sportsbook by settlement. 1,861,761 rows.</dd>
+        </dl>
+      </div>
+
+      <details class="catalogue">
+        <summary>All 19 tables in the mart, with their grain and row counts</summary>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Table</th><th scope="col">Type</th><th scope="col">Grain</th><th scope="col" class="r">Rows</th></tr></thead>
+            <tbody>
+              <tr><td><code>fct_wagering_daily</code></td><td><span class="tag fact">Fact</span></td><td>Player x game x reporting day</td><td class="r">1,861,761</td></tr>
+              <tr><td><code>fct_sportsbook_bets</code></td><td><span class="tag fact">Fact</span></td><td>Bet</td><td class="r">1,222,610</td></tr>
+              <tr><td><code>fct_player_activity_daily</code></td><td><span class="tag fact">Fact</span></td><td>Player x reporting day with real-money play</td><td class="r">1,002,694</td></tr>
+              <tr><td><code>fct_payments</code></td><td><span class="tag fact">Fact</span></td><td>Deposit or withdrawal attempt</td><td class="r">581,857</td></tr>
+              <tr><td><code>fct_campaign_assignments</code></td><td><span class="tag fact">Fact</span></td><td>Player x CRM campaign (offer or holdout)</td><td class="r">167,705</td></tr>
+              <tr><td><code>fct_bonuses</code></td><td><span class="tag fact">Fact</span></td><td>Bonus, from grant to settlement</td><td class="r">46,507</td></tr>
+              <tr><td><code>fct_account_events</code></td><td><span class="tag fact">Fact</span></td><td>Deposit limit, cool-off or self-exclusion</td><td class="r">8,134</td></tr>
+              <tr><td><code>dim_player</code></td><td><span class="tag dim">Dimension</span></td><td>Player x VIP tier version (SCD Type 2)</td><td class="r">77,858</td></tr>
+              <tr><td><code>dim_date</code></td><td><span class="tag dim">Dimension</span></td><td>Malta reporting day</td><td class="r">647</td></tr>
+              <tr><td><code>dim_game</code></td><td><span class="tag dim">Dimension</span></td><td>Casino game or sport</td><td class="r">114</td></tr>
+              <tr><td><code>dim_affiliate</code></td><td><span class="tag dim">Dimension</span></td><td>Affiliate and its deal (CPA, revenue share or hybrid)</td><td class="r">60</td></tr>
+              <tr><td><code>dim_campaign</code></td><td><span class="tag dim">Dimension</span></td><td>Welcome or CRM offer</td><td class="r">15</td></tr>
+              <tr><td><code>dim_provider</code></td><td><span class="tag dim">Dimension</span></td><td>Game provider, plus the in-house sportsbook</td><td class="r">9</td></tr>
+              <tr><td><code>dim_market</code></td><td><span class="tag dim">Dimension</span></td><td>Market, with currency and time zone</td><td class="r">7</td></tr>
+              <tr><td><code>dim_psp</code></td><td><span class="tag dim">Dimension</span></td><td>Payment service provider</td><td class="r">5</td></tr>
+              <tr><td><code>dim_brand</code></td><td><span class="tag dim">Dimension</span></td><td>Brand</td><td class="r">3</td></tr>
+              <tr><td><code>kpi_daily_ggr_by_product</code></td><td><span class="tag metric">Metrics</span></td><td>Day x brand x market x product</td><td class="r">29,841</td></tr>
+              <tr><td><code>kpi_daily_revenue</code></td><td><span class="tag metric">Metrics</span></td><td>Day x brand x market x product group</td><td class="r">15,188</td></tr>
+              <tr><td><code>kpi_daily_accounts</code></td><td><span class="tag metric">Metrics</span></td><td>Day x brand x market</td><td class="r">7,606</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================================================================ definitions -->
+    <section class="section shell reveal" id="definitions" aria-labelledby="def-title">
+      <div class="section-head">
+        <div><div class="section-kicker">Shared definitions</div><h2 id="def-title">One definition per metric</h2></div>
+        <p class="section-note">GGR and NGR are dbt macros. Every model that reports them calls the same macro, so a definition changes in one place.</p>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th scope="col">Metric</th><th scope="col">Definition</th><th scope="col">Dated by</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">GGR</th><td>Real-money stakes minus real-money winnings. Bonus-funded play is left out.</td><td>Casino: session start. Sportsbook: settlement.</td></tr>
+            <tr><th scope="row">Bonus cost</th><td>Bonus money that converted to withdrawable cash. Bonuses that are lost or expire cost nothing.</td><td>The day the bonus converts</td></tr>
+            <tr><th scope="row">NGR</th><td>GGR minus bonus cost.</td><td>As GGR and bonus cost</td></tr>
+            <tr><th scope="row">Expected GGR</th><td>What the house edge predicts: stake x (1 − RTP) for casino, stake x the bet's margin for sportsbook.</td><td>As GGR</td></tr>
+            <tr><th scope="row">FTD</th><td>A player's first successful deposit, counted once per player.</td><td>The day of the deposit</td></tr>
+            <tr><th scope="row">Deposits</th><td>Successful deposits only. Failed attempts and duplicate PSP callbacks are excluded.</td><td>The day of the request</td></tr>
+            <tr><th scope="row">Active player</th><td>Placed at least one real-money bet. Counted once per player in any period.</td><td>Casino: session start. Sportsbook: placement.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="two" style="margin-top:1rem">
+        <div class="card glass">
+          <h3>The macros</h3>
+          <p>Models never write <code>stake - win</code> themselves. They call the macro, and the dashboards show the wording from one reference table.</p>
+<pre><span class="c">-- macros/metrics.sql</span>
+<span class="k">{% macro</span> <span class="f">ggr</span>(cash_stake, cash_win) <span class="k">-%}</span>
+    ({{ cash_stake }} - {{ cash_win }})
+<span class="k">{%- endmacro %}</span>
+
+<span class="k">{% macro</span> <span class="f">ngr</span>(ggr, bonus_cost) <span class="k">-%}</span>
+    ({{ ggr }} - {{ bonus_cost }})
+<span class="k">{%- endmacro %}</span>
+
+<span class="c">-- marts/metrics/kpi_daily_revenue.sql</span>
+{{ <span class="f">ngr</span>('ggr_eur', 'bonus_cost_eur') }} as ngr_eur</pre>
+        </div>
+        <div class="card glass">
+          <h3>What NGR leaves out</h3>
+          <p>Operators define NGR differently. Many also deduct gaming duty and payment fees. This project deducts bonus cost only, and says so wherever NGR appears, so nobody compares it with a figure that means something else.</p>
+          <h3 style="margin-top:1.2rem">Why bonus play is outside GGR</h3>
+          <p>Bonus money that a player loses never cost the operator anything. Counting its stakes would inflate GGR, and then counting the bonus again in NGR would double-count it. So bonus stakes and wins are kept in their own columns, and the cost enters NGR once, when the bonus converts to cash.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ time zones -->
+    <section class="section shell reveal" id="calendar" aria-labelledby="cal-title">
+      <div class="section-head">
+        <div><div class="section-kicker">Currencies and time zones</div><h2 id="cal-title">One currency, one calendar</h2></div>
+        <p class="section-note">The platform logs UTC and the player's currency. The mart reports every amount in euros, on the Malta calendar day.</p>
+      </div>
+      <div class="two">
+        <div class="card glass">
+          <h3>A late-night session in Auckland</h3>
+          <p>One simulated casino session from New Zealand, followed through the mart.</p>
+          <ol class="steps">
+            <li><span><b>13:41 UTC, Saturday 5 September 2026</b><small>The platform's timestamp</small></span></li>
+            <li><span><b>01:41, Sunday 6 September</b><small>The player's clock in Auckland</small></span></li>
+            <li><span><b>15:41, Saturday 5 September in Malta</b><small>So the session is reported on Saturday 5 September</small></span></li>
+            <li><span><b>NZ$158.16 × 0.5640 = €89.20</b><small>Converted at Saturday's rate, which is Friday's, carried forward</small></span></li>
+          </ol>
+        </div>
+        <div class="card glass">
+          <h3>Weekend exchange rates</h3>
+          <p>Reference rates are published on business days. The mart fills the 780 currency-days without a published rate with the last rate before them.</p>
+          <div class="table-scroll" style="margin-top:.9rem">
+            <table class="fx-table">
+              <thead><tr><th scope="col">Day</th><th scope="col" class="r">EUR per GBP</th><th scope="col">Source</th></tr></thead>
+              <tbody>
+                <tr><td>Fri 4 Sep 2026</td><td class="r">1.2323</td><td>Published</td></tr>
+                <tr><td>Sat 5 Sep</td><td class="r">1.2323</td><td>Carried forward</td></tr>
+                <tr><td>Sun 6 Sep</td><td class="r">1.2323</td><td>Carried forward</td></tr>
+                <tr><td>Mon 7 Sep</td><td class="r">1.2268</td><td>Published</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="caption">Rates are simulated.</p>
+        </div>
+      </div>
+      <div class="card glass" style="margin-top:1rem">
+        <h3>Casino sessions reported on a different day than the player's own date</h3>
+        <p>Canadian evenings run past midnight in Malta. New Zealand mornings start before Malta's day does. Reporting on local dates would split the same day differently in every market.</p>
+        <div class="bars" role="list">
+          <div class="bar-row" role="listitem"><span>Canada</span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width:53.2%"></div></div><span class="r">53.2%</span></div>
+          <div class="bar-row" role="listitem"><span>New Zealand</span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width:15.2%"></div></div><span class="r">15.2%</span></div>
+          <div class="bar-row" role="listitem"><span>United Kingdom</span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width:7.3%"></div></div><span class="r">7.3%</span></div>
+          <div class="bar-row" role="listitem"><span>Finland</span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width:1.5%"></div></div><span class="r">1.5%</span></div>
+          <div class="bar-row" role="listitem"><span>Germany, Sweden, Norway</span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width:0"></div></div><span class="r">0%</span></div>
+        </div>
+        <p class="caption">Sportsbook revenue is booked when a bet settles, not when it is placed. 52% of settled bets settle on a later Malta day than they were placed, and 7,076 bets were still open when the period ended.</p>
+      </div>
+    </section>
+
+    <!-- ================================================================ VIP -->
+    <section class="section shell reveal" id="vip" aria-labelledby="vip-title">
+      <div class="section-head">
+        <div><div class="section-kicker">VIP history (SCD Type 2)</div><h2 id="vip-title">Revenue stays with the tier it was earned in</h2></div>
+        <p class="section-note">The CRM logs every tier change. The mart turns the log into date ranges, so each bet joins the tier the player held on that day.</p>
+      </div>
+      <div class="card glass">
+        <h3>One simulated player, six versions</h3>
+        <p>A VIP manager upgraded this player to Gold a week after they joined. Monthly reviews then moved them down and back up. GGR is what the player lost to the house in each version. It was negative while they were Gold, because they won more than they staked.</p>
+        <ol class="timeline" aria-label="VIP history of player 1033707">
+          <li class="seg bronze" style="flex-grow:8"><b>Bronze</b><span class="when">16–23 Jan</span><span class="ggr">€1,022</span></li>
+          <li class="seg gold" style="flex-grow:128"><b>Gold</b><span class="when">24 Jan – 31 May · manual upgrade</span><span class="ggr">−€3,002</span></li>
+          <li class="seg silver" style="flex-grow:30"><b>Silver</b><span class="when">June</span><span class="ggr">−€49</span></li>
+          <li class="seg bronze" style="flex-grow:62"><b>Bronze</b><span class="when">July – August</span><span class="ggr">€1,658</span></li>
+          <li class="seg silver" style="flex-grow:30"><b>Silver</b><span class="when">September</span><span class="ggr">€2,387</span></li>
+          <li class="seg gold open" style="flex-grow:14"><b>Gold</b><span class="when">From 1 Oct</span><span class="ggr">current</span></li>
+        </ol>
+        <p class="caption">2026. The CRM log had 78,366 rows. The dimension has 77,858 versions: 508 rows repeated the current tier or were replaced later the same day, so they don't open a version.</p>
+      </div>
+      <div class="card glass" style="margin-top:1rem">
+        <h3>GGR from July to September 2026, by VIP tier</h3>
+        <p>Joining revenue to each player's current tier moves it up the ladder, because the players who lost the most were promoted on 1 October. Silver would get €620K instead of the €222K its members produced while they were Silver.</p>
+        <div class="tier-chart">
+          <div class="tier-row"><span style="color:var(--bronze)">Bronze</span><div class="tier-bars">
+            <div class="tbar then"><i style="width:70%"></i>€989K</div>
+            <div class="tbar now"><i style="width:calc(70% * 447 / 989)"></i>€447K</div></div></div>
+          <div class="tier-row"><span style="color:var(--silver)">Silver</span><div class="tier-bars">
+            <div class="tbar then"><i style="width:calc(70% * 222 / 989)"></i>€222K</div>
+            <div class="tbar now"><i style="width:calc(70% * 620 / 989)"></i>€620K</div></div></div>
+          <div class="tier-row"><span style="color:var(--gold)">Gold</span><div class="tier-bars">
+            <div class="tbar then"><i style="width:calc(70% * 35 / 989)"></i>€35K</div>
+            <div class="tbar now"><i style="width:calc(70% * 178 / 989)"></i>€178K</div></div></div>
+          <div class="tier-row"><span style="color:var(--platinum)">Platinum</span><div class="tier-bars">
+            <div class="tbar then"><i style="width:calc(70% * 15 / 989)"></i>€15K</div>
+            <div class="tbar now"><i style="width:calc(70% * 17 / 989)"></i>€17K</div></div></div>
+        </div>
+        <div class="key"><span><i style="background:var(--cyan)"></i>Tier held at the time (SCD Type 2)</span><span><i style="background:rgba(191,0,255,.75)"></i>Tier on 1 October 2026</span></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ tests -->
+    <section class="section shell reveal" id="tests" aria-labelledby="tests-title">
+      <div class="section-head">
+        <div><div class="section-kicker">Data quality</div><h2 id="tests-title">86 tests, run on every build</h2></div>
+        <p class="section-note">dbt runs the tests after each model it builds. If one fails, nothing downstream of it is built.</p>
+      </div>
+      <div class="test-grid">
+        <div><b>31</b><span>Not-null checks</span></div>
+        <div><b>19</b><span>Unique keys</span></div>
+        <div><b>11</b><span>Relationships</span></div>
+        <div><b>9</b><span>Grain checks</span></div>
+        <div><b>8</b><span>Accepted values</span></div>
+        <div><b>8</b><span>Custom checks</span></div>
+      </div>
+      <div class="two">
+        <div class="card glass">
+          <h3>The custom checks</h3>
+          <ul class="checks">
+            <li>GGR in the mart matches GGR computed straight from the source tables, so no join duplicated or dropped rows.</li>
+            <li>The KPI tables add up to the facts they summarise.</li>
+            <li>NGR equals GGR minus bonus cost on every row.</li>
+            <li>Every amount finds an exchange rate for its currency and day.</li>
+            <li>Each player's VIP versions follow each other with no gap or overlap.</li>
+            <li>Each player has exactly one current VIP version.</li>
+            <li>Each player has at most one FTD, and it is a successful deposit.</li>
+            <li>No player is active, or deposits, before the day they registered.</li>
+          </ul>
+        </div>
+        <div class="card glass">
+          <h3>Problems in the source data</h3>
+          <p>The simulator writes data the way real platforms do, problems included. The staging models fix them.</p>
+          <div class="table-scroll" style="margin-top:.9rem">
+            <table class="issues">
+              <tbody>
+                <tr><td>1,746</td><td>PSP callbacks delivered twice. The first delivery is kept.</td></tr>
+                <tr><td>120,997</td><td>Payment statuses sent in capitals by one PSP. Normalised.</td></tr>
+                <tr><td>780</td><td>Currency-days with no published rate. The last rate is carried forward.</td></tr>
+                <tr><td>508</td><td>VIP log rows that change nothing. They don't open a version.</td></tr>
+                <tr><td>7,076</td><td>Bets still open at the end. Left out of GGR until they settle.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="story"><b>The tests caught a bug in my simulator.</b> On a player's first day, play could be timestamped before they registered. For a Canadian player who registered late in the evening, that put their first bets on an earlier Malta day than their registration. The activity check failed, and I fixed the simulator.</p>
+    </section>
+
+    <!-- ================================================================ portability -->
+    <section class="section shell reveal" id="portability" aria-labelledby="port-title">
+      <div class="section-head">
+        <div><div class="section-kicker">Portability</div><h2 id="port-title">Runs on a laptop, written to move</h2></div>
+        <p class="section-note">DuckDB builds and tests the whole mart locally. The SQL is kept easy to move to BigQuery.</p>
+      </div>
+      <div class="two">
+        <div class="card glass">
+          <h3>Engine differences in four macros</h3>
+          <p>Time-zone conversion, the date series, day of week and the float type differ between DuckDB and BigQuery. Each lives in one macro with a version per engine, and dbt picks the right one. Everything else uses SQL both engines accept. The BigQuery versions have not been run yet.</p>
+<pre><span class="k">{% macro</span> <span class="f">default__date_in_tz</span>(ts, tz) <span class="k">-%}</span>
+    cast(timezone({{ tz }}, timezone('UTC', {{ ts }})) as date)
+<span class="k">{%- endmacro %}</span>
+
+<span class="k">{% macro</span> <span class="f">bigquery__date_in_tz</span>(ts, tz) <span class="k">-%}</span>
+    date({{ ts }}, {{ tz }})
+<span class="k">{%- endmacro %}</span></pre>
+        </div>
+        <div class="card glass">
+          <h3>Rebuild it yourself</h3>
+          <p>One command simulates the platform, builds the 41 models and runs the tests, in under a minute on a laptop.</p>
+<pre><span class="c"># Python 3.12</span>
+pip install -r requirements.txt
+python run_pipeline.py</pre>
+          <p class="caption">The simulator uses a fixed seed, so every run produces the same data and the same numbers as this page.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ next -->
+    <section class="section shell reveal" aria-labelledby="next-title">
+      <div class="section-head">
+        <div><div class="section-kicker">Built on this mart</div><h2 id="next-title">What comes next</h2></div>
+      </div>
+      <ul class="next">
+        <li><span class="status">In progress</span><h3>Executive dashboard</h3><p>GGR, NGR, FTDs, deposits and active players by brand, market and product, against target and the same day last week.</p></li>
+        <li><span class="status">In progress</span><h3>NGR investigation</h3><p>Why NGR fell in September: results luck, player behaviour, acquisition or bonus cost.</p></li>
+        <li><span class="status">In progress</span><h3>Bonus ROI</h3><p>Incremental NGR from reload offers, measured against a random holdout group.</p></li>
+      </ul>
+    </section>
+
+    <section class="cta shell glass reveal" aria-labelledby="cta-title">
+      <div class="cta-copy"><div class="section-kicker">Continue exploring</div><h2 id="cta-title">Want to walk through the model?</h2><p>I can talk through the grain decisions, the definitions and how this would run on a production warehouse.</p></div>
+      <div class="cta-actions"><a class="button secondary" href="../../index.html#projects">View all projects</a><a class="button" href="../../index.html#links">Contact me</a></div>
+    </section>
+  </main>
+
+  <footer><div class="shell"><div class="footer-row"><span>© 2026 Viktor Paunovic · iGaming Data Mart</span><a href="../../index.html#projects">Back to portfolio projects ↑</a></div><small class="data-disclaimer">All data on this page is simulated, including the scenarios planted in it. Brand, provider and affiliate names are generic labels, not real companies.</small></div></footer>
+
+  <script>
+    (() => {
+      'use strict';
+      // Grain and notes for each table in the diagram. The same facts are in the catalogue table above.
+      const TABLES = {
+        dim_player: ['Player x VIP tier version', 'Brand, market, acquisition and FTD, plus VIP tier history as SCD Type 2. 77,858 versions for 70,367 players.'],
+        dim_affiliate: ['Affiliate', 'Affiliate partners and their deal: CPA, revenue share or hybrid. Reached through the player. 60 rows.'],
+        dim_date: ['Malta reporting day', 'Weeks start on Monday. Holds the same day last week for week-on-week comparisons. 647 rows.'],
+        dim_market: ['Market', 'Seven markets, six currencies, each with its time zone.'],
+        dim_brand: ['Brand', 'Three brands with their launch dates.'],
+        dim_game: ['Casino game or sport', 'Casino games and sportsbook sports in one dimension, mapped to product and product group. 114 rows.'],
+        dim_provider: ['Game provider', 'Eight game providers plus the in-house sportsbook. Reached through the game.'],
+        dim_psp: ['Payment provider', 'Five payment service providers and their payment method.'],
+        dim_campaign: ['Welcome or CRM offer', 'Offer terms, and the share of eligible players held out at random. 15 rows.'],
+        fct_wagering_daily: ['One row per player, game (or sport) and Malta reporting day', 'Real-money and bonus wagering. Casino play is dated by session start, sportsbook by settlement. 1,861,761 rows.'],
+        fct_sportsbook_bets: ['One row per bet', 'Odds, legs and the bet’s theoretical margin, for hold analysis. 1,222,610 rows.'],
+        fct_payments: ['One row per deposit or withdrawal attempt', 'Duplicate PSP callbacks removed, failed attempts kept and flagged, FTD marked. 581,857 rows.'],
+        fct_bonuses: ['One row per bonus', 'From grant to settlement. Bonus cost is what converted to withdrawable cash. 46,507 rows.'],
+        fct_campaign_assignments: ['One row per player per CRM campaign', 'Who was eligible, and whether they got the offer or were held out. 167,705 rows.'],
+        fct_player_activity_daily: ['One row per player per day with real-money play', 'Casino and sportsbook flags, for distinct active-player counts over any period. 1,002,694 rows.'],
+        fct_account_events: ['One row per account event', 'Deposit limits, cool-offs and self-exclusions. 8,134 rows.'],
+        kpi: ['Day x brand x market (x product group or product)', 'Turnover, GGR, expected GGR, bonus cost, NGR, FTDs, deposits and active players, for complete Malta days only.']
+      };
+      const svg = document.getElementById('schema');
+      const detail = document.getElementById('schema-detail');
+      if (svg && detail) {
+        const nodes = [...svg.querySelectorAll('.node')];
+        const edges = [...svg.querySelectorAll('.edge')];
+        const shared = ['dim_player', 'dim_date', 'dim_market', 'dim_brand'];
+        const facts = nodes.filter(n => n.classList.contains('fact')).map(n => n.dataset.id);
+        const neighbours = id => {
+          const set = new Set([id]);
+          const on = new Set();
+          edges.forEach(e => {
+            const a = e.dataset.a, b = e.dataset.b;
+            if (a === id || b === id) { on.add(e); if (a) set.add(a); if (b) set.add(b); }
+          });
+          // facts reach the shared dimensions through the bus, and vice versa
+          if (facts.includes(id)) shared.forEach(s => set.add(s));
+          if (shared.includes(id)) facts.forEach(f => set.add(f));
+          if (facts.includes(id) || shared.includes(id)) {
+            edges.forEach(e => { if (e.dataset.from === 'bus' || (!e.dataset.b && set.has(e.dataset.a))) on.add(e); });
+          }
+          if (id === 'dim_affiliate') { set.add('dim_player'); }
+          // the metric tables summarise wagering, bonuses, payments and activity
+          if (id === 'kpi') { ['fct_wagering_daily', 'fct_bonuses', 'fct_payments', 'fct_player_activity_daily'].forEach(f => set.add(f)); }
+          if (id === 'dim_provider') { set.add('dim_game'); }
+          return [set, on];
+        };
+        const show = node => {
+          const id = node.dataset.id;
+          const [set, on] = neighbours(id);
+          svg.classList.add('schema-active');
+          nodes.forEach(n => n.classList.toggle('on', set.has(n.dataset.id)));
+          edges.forEach(e => e.classList.toggle('on', on.has(e)));
+          const t = TABLES[id];
+          const name = id === 'kpi' ? 'kpi_daily_* (metrics layer)' : id;
+          detail.innerHTML = '';
+          [['Table', name, 'name'], ['Grain', t[0]], ['About', t[1]]].forEach(([k, v, cls]) => {
+            const dt = document.createElement('dt'); dt.textContent = k;
+            const dd = document.createElement('dd');
+            if (cls) { const s = document.createElement('span'); s.className = cls; s.textContent = v; dd.append(s); } else dd.textContent = v;
+            detail.append(dt, dd);
+          });
+        };
+        const clear = () => { svg.classList.remove('schema-active'); nodes.forEach(n => n.classList.remove('on')); edges.forEach(e => e.classList.remove('on')); };
+        nodes.forEach(n => {
+          n.addEventListener('mouseenter', () => show(n));
+          n.addEventListener('focus', () => show(n));
+          n.addEventListener('click', () => show(n));
+          n.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(n); } });
+        });
+        svg.addEventListener('mouseleave', clear);
+        svg.addEventListener('focusout', e => { if (!svg.contains(e.relatedTarget)) clear(); });
+      }
+
+      const reveal = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(entries => entries.forEach(entry => {
+          if (entry.isIntersecting) { entry.target.classList.add('visible'); io.unobserve(entry.target); }
+        }), { threshold: .06 });
+        reveal.forEach(el => io.observe(el));
+      } else {
+        reveal.forEach(el => el.classList.add('visible'));
+      }
+    })();
+  </script>
+</body>
+</html>
